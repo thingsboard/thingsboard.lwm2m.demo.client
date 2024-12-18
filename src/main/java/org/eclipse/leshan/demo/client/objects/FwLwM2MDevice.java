@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.leshan.demo.client;
+package org.eclipse.leshan.demo.client.objects;
 
 
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {

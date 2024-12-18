@@ -13,13 +13,12 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.cli;
-
-import org.slf4j.LoggerFactory;
+package org.eclipse.leshan.demo.client.cli;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Option;
 
 /**

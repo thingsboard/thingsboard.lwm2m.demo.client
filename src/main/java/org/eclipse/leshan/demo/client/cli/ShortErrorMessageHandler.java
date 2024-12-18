@@ -14,6 +14,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.demo.client.cli;
 
+import org.eclipse.leshan.core.demo.cli.MultiParameterException;
 import picocli.CommandLine;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Layout;

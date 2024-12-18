@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.demo.client;
 
-import org.eclipse.leshan.demo.LeshanProperties;
+import org.eclipse.leshan.core.demo.LeshanProperties;
 import picocli.CommandLine.IVersionProvider;
 
 public class VersionProvider implements IVersionProvider {

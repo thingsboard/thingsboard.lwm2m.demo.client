@@ -13,7 +13,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.client;
+package org.eclipse.leshan.demo.client;
 
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.scandium.config.DtlsConfig;
@@ -21,8 +21,13 @@ import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.LeshanClientBuilder;
+import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointFactory;
+import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointsProvider;
+import org.eclipse.leshan.client.californium.endpoint.ClientProtocolProvider;
+import org.eclipse.leshan.client.californium.endpoint.coap.CoapOscoreProtocolProvider;
+import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientEndpointFactory;
+import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientProtocolProvider;
 import org.eclipse.leshan.client.endpoint.LwM2mClientEndpointsProvider;
-import org.eclipse.leshan.client.engine.DefaultClientEndpointNameProvider;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.LwM2mTestObject;
 import org.eclipse.leshan.client.object.Oscore;
@@ -32,6 +37,9 @@ import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.client.resource.listener.ObjectsListenerAdapter;
 import org.eclipse.leshan.client.send.ManualDataSender;
 import org.eclipse.leshan.client.servers.LwM2mServer;
+import org.eclipse.leshan.core.californium.PrincipalMdcConnectionListener;
+import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
+import org.eclipse.leshan.core.demo.cli.interactive.InteractiveCLI;
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import org.eclipse.leshan.core.model.ObjectLoader;
@@ -44,23 +52,20 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.BootstrapWriteResponse;
-import org.eclipse.leshan.demo.LwM2mDemoConstant;
-import org.eclipse.leshan.demo.cli.ShortErrorMessageHandler;
-import org.eclipse.leshan.demo.cli.interactive.InteractiveCLI;
 import org.eclipse.leshan.demo.client.cli.LeshanClientDemoCLI;
+import org.eclipse.leshan.demo.client.cli.ShortErrorMessageHandler;
 import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands;
-import org.eclipse.leshan.transport.californium.PrincipalMdcConnectionListener;
-import org.eclipse.leshan.transport.californium.client.endpoint.CaliforniumClientEndpointFactory;
-import org.eclipse.leshan.transport.californium.client.endpoint.CaliforniumClientEndpointsProvider;
-import org.eclipse.leshan.transport.californium.client.endpoint.ClientProtocolProvider;
-import org.eclipse.leshan.transport.californium.client.endpoint.coap.CoapOscoreProtocolProvider;
-import org.eclipse.leshan.transport.californium.client.endpoint.coaps.CoapsClientEndpointFactory;
-import org.eclipse.leshan.transport.californium.client.endpoint.coaps.CoapsClientProtocolProvider;
+import org.eclipse.leshan.demo.client.objects.FwLwM2MDevice;
+import org.eclipse.leshan.demo.client.objects.MyDevice;
+import org.eclipse.leshan.demo.client.objects.MyLocation;
+import org.eclipse.leshan.demo.client.objects.RandomTemperatureSensor;
+import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapsTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.endpoint.JavaCoapClientEndpointsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -80,11 +85,13 @@ import static org.eclipse.leshan.client.object.Security.rpkBootstrap;
 import static org.eclipse.leshan.client.object.Security.x509;
 import static org.eclipse.leshan.client.object.Security.x509Bootstrap;
 import static org.eclipse.leshan.core.LwM2mId.DEVICE;
+import static org.eclipse.leshan.core.LwM2mId.FIRMWARE;
 import static org.eclipse.leshan.core.LwM2mId.LOCATION;
 import static org.eclipse.leshan.core.LwM2mId.OSCORE;
 import static org.eclipse.leshan.core.LwM2mId.SECURITY;
 import static org.eclipse.leshan.core.LwM2mId.SERVER;
 
+@SpringBootApplication
 public class LeshanClientDemo {
 
     static {
@@ -240,6 +247,7 @@ public class LeshanClientDemo {
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
+        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice());
         initializer.setInstancesForObject(LOCATION, locationInstance);
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
@@ -324,7 +332,7 @@ public class LeshanClientDemo {
 
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(
-                new DefaultClientEndpointNameProvider(cli.main.endpoint, cli.main.endpointNameMode));
+                new DefaultClientEndpointNameProvider(cli.main.endpoint, cli.main.endpointNameMode).getEndpointName());
         builder.setObjects(enablers);
         builder.setEndpointsProviders(
                 endpointsProvider.toArray(new LwM2mClientEndpointsProvider[endpointsProvider.size()]));
@@ -347,7 +355,7 @@ public class LeshanClientDemo {
                 BootstrapWriteResponse response = null;
                 try {
                     // get resource from string resource value
-                    LwM2mSingleResource resource = textDecoder.decode(resourceValue.getBytes(), null, resourcePath,
+                    LwM2mSingleResource resource = textDecoder.decode(resourceValue.getBytes(), resourcePath,
                             repository.getLwM2mModel(), LwM2mSingleResource.class);
                     // try to write this resource
                     response = client.getObjectTree().getObjectEnabler(resourcePath.getObjectId()).write(

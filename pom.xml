@@ -8,9 +8,9 @@
         <version>3.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>org.eclipse.leshan.demo.client</groupId>
     <artifactId>lehsan-demo-client</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>lehsan-demo-client</name>
     <description>lehsan-demo-client</description>
     <url/>
@@ -28,6 +28,10 @@
     </scm>
     <properties>
         <java.version>17</java.version>
+        <picocli.version>4.7.5</picocli.version>
+        <californium.version>3.12.1</californium.version>
+        <leshan.version>2.0.0-M15</leshan.version>
+        <leshan-tl.version>2.0.0-M16</leshan-tl.version>
     </properties>
     <dependencies>
         <dependency>
@@ -55,6 +59,36 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.leshan</groupId>
+            <artifactId>leshan-client-cf</artifactId>
+            <version>${leshan.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.leshan</groupId>
+            <artifactId>leshan-core-demo</artifactId>
+            <version>${leshan.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.californium</groupId>
+            <artifactId>californium-core</artifactId>
+            <version>${californium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.californium</groupId>
+            <artifactId>scandium</artifactId>
+            <version>${californium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.leshan</groupId>
+            <artifactId>leshan-tl-jc-client-coap</artifactId>
+            <version>${leshan-tl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.leshan</groupId>
+            <artifactId>leshan-tl-jc-client-coaptcp</artifactId>
+            <version>${leshan-tl.version}</version>
         </dependency>
     </dependencies>
 

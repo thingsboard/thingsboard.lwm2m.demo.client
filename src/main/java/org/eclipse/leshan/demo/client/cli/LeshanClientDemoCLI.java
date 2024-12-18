@@ -13,23 +13,22 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.client.cli;
+package org.eclipse.leshan.demo.client.cli;
 
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
-import org.eclipse.leshan.client.engine.DefaultClientEndpointNameProvider;
-import org.eclipse.leshan.client.engine.DefaultClientEndpointNameProvider.Mode;
 import org.eclipse.leshan.core.CertificateUsage;
+import org.eclipse.leshan.core.demo.cli.MultiParameterException;
+import org.eclipse.leshan.core.demo.cli.converters.CIDConverter;
+import org.eclipse.leshan.core.demo.cli.converters.InetAddressConverter;
+import org.eclipse.leshan.core.demo.cli.converters.ResourcePathConverter;
+import org.eclipse.leshan.core.demo.cli.converters.StrictlyPositiveIntegerConverter;
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.demo.cli.MultiParameterException;
-import org.eclipse.leshan.demo.cli.StandardHelpOptions;
-import org.eclipse.leshan.demo.cli.VersionProvider;
-import org.eclipse.leshan.demo.cli.converters.CIDConverter;
-import org.eclipse.leshan.demo.cli.converters.InetAddressConverter;
-import org.eclipse.leshan.demo.cli.converters.ResourcePathConverter;
-import org.eclipse.leshan.demo.cli.converters.StrictlyPositiveIntegerConverter;
+import org.eclipse.leshan.demo.client.VersionProvider;
+import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider;
+import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider.Mode;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ITypeConverter;
