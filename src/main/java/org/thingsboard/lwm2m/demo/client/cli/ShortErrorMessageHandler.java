@@ -12,7 +12,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.cli;
+package org.thingsboard.lwm2m.demo.client.cli;
 
 import org.eclipse.leshan.core.demo.cli.MultiParameterException;
 import picocli.CommandLine;

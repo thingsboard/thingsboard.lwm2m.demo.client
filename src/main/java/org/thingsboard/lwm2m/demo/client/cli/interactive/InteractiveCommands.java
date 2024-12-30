@@ -12,7 +12,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.cli.interactive;
+package org.thingsboard.lwm2m.demo.client.cli.interactive;
 
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
@@ -39,14 +39,14 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendResponse;
-import org.eclipse.leshan.demo.client.objects.MyLocation;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.CollectCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.CreateCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.DeleteCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.ListCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.MoveCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.SendCommand;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands.UpdateCommand;
+import org.thingsboard.lwm2m.demo.client.objects.MyLocation;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CollectCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CreateCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.DeleteCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.ListCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.MoveCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.SendCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.UpdateCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;

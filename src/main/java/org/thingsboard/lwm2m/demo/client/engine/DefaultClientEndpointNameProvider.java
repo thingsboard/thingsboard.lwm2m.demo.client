@@ -13,7 +13,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.engine;
+package org.thingsboard.lwm2m.demo.client.engine;
 
 import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.core.request.UplinkRequest;

@@ -13,7 +13,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.cli;
+package org.thingsboard.lwm2m.demo.client.cli;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

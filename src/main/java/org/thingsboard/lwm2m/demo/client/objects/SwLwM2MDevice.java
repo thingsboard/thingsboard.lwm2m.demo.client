@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.leshan.demo.client.objects;
+package org.thingsboard.lwm2m.demo.client.objects;
 
-
+import org.eclipse.californium.elements.util.DaemonThreadFactory;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -30,48 +30,44 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.Destroyable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
+public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
-    private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 9);
+    private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 4, 6, 7, 9);
 
-
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
+            new DaemonThreadFactory(getClass().getSimpleName() + "-test-scope"));
     private final AtomicInteger state = new AtomicInteger(0);
 
     private final AtomicInteger updateResult = new AtomicInteger(0);
-    private final Timer timer;
 
-    public FwLwM2MDevice() {
-        // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                fireResourceChange(9);
-            }
-        }, 5000, 5000);
+    private int objectForTest;
+
+    public SwLwM2MDevice() {
     }
 
+    public SwLwM2MDevice(int objectForTest) {
+        this.objectForTest = objectForTest;
+    }
 
     @Override
     public ReadResponse read(LwM2mServer identity, int resourceId) {
         if (!identity.isSystem())
             LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
-            case 3:
-                return ReadResponse.success(resourceId, getState());
-            case 5:
-                return ReadResponse.success(resourceId, getUpdateResult());
-            case 6:
+            case 0:
                 return ReadResponse.success(resourceId, getPkgName());
-            case 7:
+            case 1:
                 return ReadResponse.success(resourceId, getPkgVersion());
+            case 7:
+                return ReadResponse.success(resourceId, getUpdateState());
             case 9:
-                return ReadResponse.success(resourceId, getFirmwareUpdateDeliveryMethod());
+                return ReadResponse.success(resourceId, getUpdateResult());
             default:
                 return super.read(identity, resourceId);
         }
@@ -84,10 +80,13 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             withArguments = " with arguments " + arguments;
         LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
 
-
         switch (resourceId) {
-            case 2:
-//                startUpdating();
+            case 4:
+                if (this.objectForTest > 0) {
+                    startUpdating();
+                }
+                return ExecuteResponse.success();
+            case 6:
                 return ExecuteResponse.success();
             default:
                 return super.execute(identity, resourceId, arguments);
@@ -99,18 +98,18 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
 
         switch (resourceId) {
-            case 0:
-//                startDownloading();
-                return WriteResponse.success();
-            case 1:
-//                startDownloading();
+            case 2:
+            case 3:
+                if(this.objectForTest> 0 ) {
+                    startDownloading();
+                }
                 return WriteResponse.success();
             default:
                 return super.write(identity, replace, resourceId, value);
         }
     }
 
-    private int getState() {
+    private int getUpdateState() {
         return state.get();
     }
 
@@ -119,15 +118,11 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private String getPkgName() {
-        return "firmware";
+        return "software";
     }
 
     private String getPkgVersion() {
         return "1.0.0";
-    }
-
-    private int getFirmwareUpdateDeliveryMethod() {
-        return 1;
     }
 
     @Override
@@ -137,33 +132,38 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     @Override
     public void destroy() {
-        timer.cancel();
+        scheduler.shutdownNow();
     }
 
-//    private void startDownloading() {
-//        scheduler.schedule(() -> {
-//            try {
-//                state.set(1);
-//                fireResourceChange(3);
-//                Thread.sleep(100);
-//                state.set(2);
-//                fireResourceChange(3);
-//            } catch (Exception e) {
-//            }
-//        }, 100, TimeUnit.MILLISECONDS);
-//    }
+    private void startDownloading() {
+        scheduler.schedule(() -> {
+            try {
+                state.set(1);
+                updateResult.set(1);
+                fireResourceChange(7);
+                fireResourceChange(9);
+                Thread.sleep(100);
+                state.set(2);
+                fireResourceChange(7);
+                Thread.sleep(100);
+                state.set(3);
+                fireResourceChange(7);
+                Thread.sleep(100);
+                updateResult.set(3);
+                fireResourceChange(9);
+            } catch (Exception e) {
 
-//    private void startUpdating() {
-//        scheduler.schedule(() -> {
-//            try {
-//                state.set(3);
-//                fireResourceChange(3);
-//                Thread.sleep(100);
-//                updateResult.set(1);
-//                fireResourceChange(5);
-//            } catch (Exception e) {
-//            }
-//        }, 100, TimeUnit.MILLISECONDS);
-//    }
+            }
+        }, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private void startUpdating() {
+        scheduler.schedule(() -> {
+            state.set(4);
+            updateResult.set(2);
+            fireResourceChange(7);
+            fireResourceChange(9);
+        }, 100, TimeUnit.MILLISECONDS);
+    }
 
 }

@@ -13,7 +13,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client.cli;
+package org.thingsboard.lwm2m.demo.client.cli;
 
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
@@ -26,9 +26,8 @@ import org.eclipse.leshan.core.demo.cli.converters.StrictlyPositiveIntegerConver
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.demo.client.VersionProvider;
-import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider;
-import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider.Mode;
+import org.thingsboard.lwm2m.demo.client.VersionProvider;
+import org.thingsboard.lwm2m.demo.client.engine.DefaultClientEndpointNameProvider.Mode;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ITypeConverter;
@@ -55,15 +54,17 @@ import java.util.stream.Stream;
                  + "@|italic " //
                  + "This is a LWM2M client demo implemented with Leshan library.%n" //
                  + "You can launch it without any option and it will try to register to a LWM2M server at " + "coap://"
-                 + LeshanClientDemoCLI.DEFAULT_COAP_URL + ".%n" //
+                 + ClientDemoCLI.DEFAULT_COAP_URL + ".%n" //
                  + "%n" //
                  + "Californium is used as CoAP library and some CoAP parameters can be tweaked in 'Californium.properties' file." //
                  + "|@%n%n",
          versionProvider = VersionProvider.class)
-public class LeshanClientDemoCLI implements Runnable {
+public class ClientDemoCLI implements Runnable {
 
-    public static final String DEFAULT_COAP_URL = "localhost:" + CoAP.DEFAULT_COAP_PORT;
-    public static final String DEFAULT_COAPS_URL = "localhost:" + CoAP.DEFAULT_COAP_SECURE_PORT;
+//    public static final String DEFAULT_COAP_URL = "localhost:" + CoAP.DEFAULT_COAP_PORT;
+    public static final String DEFAULT_COAP_URL = "localhost:" + 5685;
+//    public static final String DEFAULT_COAPS_URL = "localhost:" + CoAP.DEFAULT_COAP_SECURE_PORT;
+    public static final String DEFAULT_COAPS_URL = "localhost:" + 5686;
 
     private static String defaultEndpoint() {
         try {
@@ -99,7 +100,8 @@ public class LeshanClientDemoCLI implements Runnable {
                 description = { //
                         "Set the endpoint name of the Client.", //
                         "Default the hostname or 'LeshanClientDemo' if no hostname." })
-        public String endpoint = LeshanClientDemoCLI.defaultEndpoint();
+//        public String endpoint = ClientDemoCLI.defaultEndpoint();
+        public String endpoint = "lwm2mThingFwTest";
 
         @Option(names = { "-l", "--lifetime" },
                 defaultValue = "300" /* 5 minutes */,
@@ -179,7 +181,10 @@ public class LeshanClientDemoCLI implements Runnable {
                         "Can be used to set if client should or should not send client endpoint name during registration or bootstrap.", //
                         "Default : ${DEFAULT-VALUE}.",//
                 })
-        public DefaultClientEndpointNameProvider.Mode endpointNameMode = Mode.ALWAYS;
+        public Mode endpointNameMode = Mode.ALWAYS;
+
+        @Option(names = { "-t", "--uses-object-for-test" }, description = { "The client uses Object IDs: 5, 9, 19 to test custom-programmed algorithms." })
+        public int objectForTest;
     }
 
     /* ********************************** Location Section ******************************** */
@@ -369,9 +374,11 @@ public class LeshanClientDemoCLI implements Runnable {
         if (!StringUtils.isNumeric(port)) {
             // it seems port is not present, so we try to add it
             if (identity.hasIdentity()) {
-                main.url = url + ":" + CoAP.DEFAULT_COAP_SECURE_PORT;
+//                main.url = url + ":" + CoAP.DEFAULT_COAP_SECURE_PORT;
+                main.url = url + ":" + 5686;
             } else {
-                main.url = url + ":" + CoAP.DEFAULT_COAP_PORT;
+//                main.url = url + ":" + CoAP.DEFAULT_COAP_PORT;
+                main.url = url + ":" + 5685;
             }
         }
 

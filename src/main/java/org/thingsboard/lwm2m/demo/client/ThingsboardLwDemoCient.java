@@ -13,12 +13,14 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.demo.client;
+package org.thingsboard.lwm2m.demo.client;
 
+import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.scandium.config.DtlsConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
+import org.eclipse.californium.scandium.dtls.MaxFragmentLengthExtension.Length;
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.LeshanClientBuilder;
 import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointFactory;
@@ -52,14 +54,16 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.BootstrapWriteResponse;
-import org.eclipse.leshan.demo.client.cli.LeshanClientDemoCLI;
-import org.eclipse.leshan.demo.client.cli.ShortErrorMessageHandler;
-import org.eclipse.leshan.demo.client.cli.interactive.InteractiveCommands;
-import org.eclipse.leshan.demo.client.objects.FwLwM2MDevice;
-import org.eclipse.leshan.demo.client.objects.MyDevice;
-import org.eclipse.leshan.demo.client.objects.MyLocation;
-import org.eclipse.leshan.demo.client.objects.RandomTemperatureSensor;
-import org.eclipse.leshan.demo.client.engine.DefaultClientEndpointNameProvider;
+import org.thingsboard.lwm2m.demo.client.cli.ClientDemoCLI;
+import org.thingsboard.lwm2m.demo.client.cli.ShortErrorMessageHandler;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands;
+import org.thingsboard.lwm2m.demo.client.objects.FwLwM2MDevice;
+import org.thingsboard.lwm2m.demo.client.objects.LwM2mBinaryAppDataContainer;
+import org.thingsboard.lwm2m.demo.client.objects.MyDevice;
+import org.thingsboard.lwm2m.demo.client.objects.MyLocation;
+import org.thingsboard.lwm2m.demo.client.objects.RandomTemperatureSensor;
+import org.thingsboard.lwm2m.demo.client.engine.DefaultClientEndpointNameProvider;
+import org.thingsboard.lwm2m.demo.client.objects.SwLwM2MDevice;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapsTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.endpoint.JavaCoapClientEndpointsProvider;
@@ -73,7 +77,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
+import static org.eclipse.californium.scandium.config.DtlsConfig.DTLS_MAX_FRAGMENT_LENGTH;
+import static org.eclipse.californium.scandium.config.DtlsConfig.DTLS_MAX_TRANSMISSION_UNIT;
 import static org.eclipse.leshan.client.object.Security.noSec;
 import static org.eclipse.leshan.client.object.Security.noSecBootstrap;
 import static org.eclipse.leshan.client.object.Security.oscoreOnly;
@@ -90,9 +98,11 @@ import static org.eclipse.leshan.core.LwM2mId.LOCATION;
 import static org.eclipse.leshan.core.LwM2mId.OSCORE;
 import static org.eclipse.leshan.core.LwM2mId.SECURITY;
 import static org.eclipse.leshan.core.LwM2mId.SERVER;
+import static org.eclipse.leshan.core.LwM2mId.SOFTWARE_MANAGEMENT;
+import static org.thingsboard.lwm2m.demo.client.util.Utils.fromLength;
 
 @SpringBootApplication
-public class LeshanClientDemo {
+public class ThingsboardLwDemoCient {
 
     static {
         // Define a default logback.configurationFile
@@ -102,7 +112,8 @@ public class LeshanClientDemo {
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(LeshanClientDemo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ThingsboardLwDemoCient.class);
+    public static final int BINARY_APP_DATA_CONTAINER = 19;
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
     private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
@@ -111,7 +122,7 @@ public class LeshanClientDemo {
     public static void main(String[] args) {
 
         // Parse command line
-        LeshanClientDemoCLI cli = new LeshanClientDemoCLI();
+        ClientDemoCLI cli = new ClientDemoCLI();
         CommandLine command = new CommandLine(cli).setParameterExceptionHandler(new ShortErrorMessageHandler());
         // Handle exit code error
         int exitCode = command.execute(args);
@@ -156,7 +167,7 @@ public class LeshanClientDemo {
         }
     }
 
-    private static LwM2mModelRepository createModel(LeshanClientDemoCLI cli) throws Exception {
+    private static LwM2mModelRepository createModel(ClientDemoCLI cli) throws Exception {
 
         List<ObjectModel> models = ObjectLoader.loadAllDefault();
         models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
@@ -167,7 +178,7 @@ public class LeshanClientDemo {
         return new LwM2mModelRepository(models);
     }
 
-    public static LeshanClient createClient(LeshanClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
+    public static LeshanClient createClient(ClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
         // create Leshan client from command line option
         final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
                 cli.location.position.longitude, cli.location.scaleFactor);
@@ -247,8 +258,11 @@ public class LeshanClientDemo {
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
-        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice());
+        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.objectForTest));
+        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.objectForTest));
         initializer.setInstancesForObject(LOCATION, locationInstance);
+        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0, cli.main.objectForTest),
+                new LwM2mBinaryAppDataContainer(1, cli.main.objectForTest));
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
 
@@ -279,8 +293,12 @@ public class LeshanClientDemo {
                         builder.setSessionListener(new DtlsSessionLogger());
 
                         // Add MDC for connection logs
-                        if (cli.helpsOptions.getVerboseLevel() > 0)
+                        if (cli.helpsOptions.getVerboseLevel() > 0) {
                             builder.setConnectionListener(new PrincipalMdcConnectionListener());
+                        }
+                        Length length = fromLength(1024);
+                        builder.set(DTLS_MAX_FRAGMENT_LENGTH, length);
+                        builder.set(DTLS_MAX_TRANSMISSION_UNIT, 1024);
                         return builder;
                     };
                 };
@@ -305,6 +323,16 @@ public class LeshanClientDemo {
         clientCoapConfig.setTransient(DtlsConfig.DTLS_CONNECTION_ID_LENGTH);
         clientCoapConfig.set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, !cli.dtls.supportDeprecatedCiphers);
         clientCoapConfig.set(DtlsConfig.DTLS_CONNECTION_ID_LENGTH, cli.dtls.cid);
+        clientCoapConfig.set(CoapConfig.BLOCKWISE_STRICT_BLOCK2_OPTION, true);
+        clientCoapConfig.set(CoapConfig.BLOCKWISE_ENTITY_TOO_LARGE_AUTO_FAILOVER, true);
+        clientCoapConfig.set(CoapConfig.BLOCKWISE_STATUS_LIFETIME, DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS, TimeUnit.SECONDS);
+        clientCoapConfig.set(CoapConfig.MAX_RESOURCE_BODY_SIZE, 256 * 1024 * 1024);
+        clientCoapConfig.set(CoapConfig.RESPONSE_MATCHING, CoapConfig.MatcherMode.RELAXED);
+        clientCoapConfig.set(CoapConfig.PREFERRED_BLOCK_SIZE, 1024);
+        clientCoapConfig.set(CoapConfig.MAX_MESSAGE_SIZE, 1024);
+        clientCoapConfig.set(CoapConfig.MAX_RETRANSMIT, 4);
+
+        
 
         // Persist configuration
         File configFile = new File(CF_CONFIGURATION_FILENAME);
