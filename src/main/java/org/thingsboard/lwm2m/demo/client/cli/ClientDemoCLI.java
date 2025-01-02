@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 /**
  * This is the class defining the Command Line Interface of Leshan Client Demo.
  */
-@Command(name = "leshan-demo-client",
+@Command(name = "thingsboard-lw-demo-client",
          sortOptions = false,
          description = "%n"//
                  + "@|italic " //
@@ -70,7 +70,7 @@ public class ClientDemoCLI implements Runnable {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            return "LeshanClientDemo";
+            return "ThingsboardClientDemo";
         }
     }
 
@@ -100,8 +100,8 @@ public class ClientDemoCLI implements Runnable {
                 description = { //
                         "Set the endpoint name of the Client.", //
                         "Default the hostname or 'LeshanClientDemo' if no hostname." })
-//        public String endpoint = ClientDemoCLI.defaultEndpoint();
-        public String endpoint = "lwm2mThingFwTest";
+        public String endpoint = ClientDemoCLI.defaultEndpoint();
+//        public String endpoint = "lwm2mThingFwTest";
 
         @Option(names = { "-l", "--lifetime" },
                 defaultValue = "300" /* 5 minutes */,
