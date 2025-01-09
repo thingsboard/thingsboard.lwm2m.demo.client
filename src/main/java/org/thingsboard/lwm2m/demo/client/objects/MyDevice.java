@@ -58,6 +58,7 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
             @Override
             public void run() {
                 fireResourceChange(13);
+                fireResourceChange(9);
             }
         }, 5000, 5000);
     }

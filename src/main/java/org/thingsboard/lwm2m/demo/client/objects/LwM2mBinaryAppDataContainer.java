@@ -83,7 +83,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
 
     public LwM2mBinaryAppDataContainer() {
         // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
+        this.timer = new Timer("19 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -97,7 +97,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
         this.objectForTest = objectForTest;
         if (id != null) this.setId(id);
         // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
+        this.timer = new Timer("19 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

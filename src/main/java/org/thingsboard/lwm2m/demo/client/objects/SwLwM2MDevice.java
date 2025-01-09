@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.Destroyable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -47,12 +49,28 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private final AtomicInteger updateResult = new AtomicInteger(0);
 
     private int objectForTest;
+    private final Timer timer;
 
     public SwLwM2MDevice() {
+        this.timer = new Timer("9 - Device-Current Time");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(7);
+            }
+        }, 5000, 5000);
     }
 
     public SwLwM2MDevice(int objectForTest) {
         this.objectForTest = objectForTest;
+        // notify new date each 5 second
+        this.timer = new Timer("9 - Device-Current Time");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(7);
+            }
+        }, 5000, 5000);
     }
 
     @Override

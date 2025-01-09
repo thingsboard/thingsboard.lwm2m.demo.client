@@ -53,7 +53,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     public FwLwM2MDevice() {
         // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
+        this.timer = new Timer("5 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -65,7 +65,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     public FwLwM2MDevice(int objectForTest) {
         this.objectForTest = objectForTest;
         // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
+        this.timer = new Timer("5 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -146,7 +146,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private int getFirmwareUpdateDeliveryMethod() {
-        return 1;
+        return 2;
     }
 
     @Override

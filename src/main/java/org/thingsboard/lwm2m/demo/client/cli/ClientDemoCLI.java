@@ -101,7 +101,6 @@ public class ClientDemoCLI implements Runnable {
                         "Set the endpoint name of the Client.", //
                         "Default the hostname or 'LeshanClientDemo' if no hostname." })
         public String endpoint = ClientDemoCLI.defaultEndpoint();
-//        public String endpoint = "lwm2mThingFwTest";
 
         @Option(names = { "-l", "--lifetime" },
                 defaultValue = "300" /* 5 minutes */,

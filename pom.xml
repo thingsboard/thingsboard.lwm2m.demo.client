@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
     <artifactId>thingsboard-lw-demo-client</artifactId>
-    <version>3.9.2</version>
+    <version>3.9.4</version>
     <name>thingsboard-demo-client</name>
     <description>thingsboard-lw-demo-client</description>
     <url/>
@@ -29,9 +29,9 @@
     <properties>
         <java.version>17</java.version>
         <picocli.version>4.7.5</picocli.version>
-        <californium.version>3.12.1</californium.version>
+        <californium.version>4.0.0-M2</californium.version>
         <leshan.version>2.0.0-M15</leshan.version>
-        <leshan-tl.version>2.0.0-M16</leshan-tl.version>
+        <leshan-tl.version>2.0.0-M17</leshan-tl.version>
     </properties>
     <dependencies>
         <dependency>
