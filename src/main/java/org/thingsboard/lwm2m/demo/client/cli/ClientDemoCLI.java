@@ -131,7 +131,11 @@ public class ClientDemoCLI implements Runnable {
 
         @Option(names = { "-m", "--models-folder" },
                 description = { //
-                        "A folder which contains object models in OMA DDF(xml)format." })
+                        "A folder which contains object models in OMA DDF(xml)format.", //
+                        "syntax is :", //
+                        "-m ./", //
+                        "-m ./models", //
+                        "-m /absolute/path/to" })
         public File modelsFolder;
 
         @Option(names = { "-aa", "--additional-attributes" },
@@ -182,7 +186,15 @@ public class ClientDemoCLI implements Runnable {
                 })
         public Mode endpointNameMode = Mode.ALWAYS;
 
-        @Option(names = { "-t", "--uses-object-for-test" }, description = { "The client uses Object IDs: 5, 9, 19 to test custom-programmed algorithms." })
+        @Option(names = { "-t", "--test-objects" },
+                description = { //
+                        "Specifies a positive integer flag for testing custom-programmed algorithms. Must be > 0.", //
+                        "!!! The value for -t must be greater than 0.", //
+                        "Testing custom-programmed algorithms is restricted to Object IDs 5, 9, and 19.", //
+                        "Default : 1", //
+                        "syntax is :", //
+                        "-t 1", //
+                })
         public int objectForTest;
     }
 

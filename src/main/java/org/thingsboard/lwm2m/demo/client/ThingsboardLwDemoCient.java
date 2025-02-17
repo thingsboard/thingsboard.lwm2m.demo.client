@@ -76,7 +76,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
@@ -172,9 +174,14 @@ public class ThingsboardLwDemoCient {
         List<ObjectModel> models = ObjectLoader.loadAllDefault();
         models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
         if (cli.main.modelsFolder != null) {
-            models.addAll(ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true));
+            List<ObjectModel> modelsCli = ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true);
+            Set<Integer> idsToRemove = new HashSet<>();
+            for (ObjectModel model : modelsCli) {
+                idsToRemove.add(model.id);
+            }
+            models.removeIf(model -> idsToRemove.contains(model.id));
+            models.addAll(modelsCli);
         }
-
         return new LwM2mModelRepository(models);
     }
 
