@@ -26,7 +26,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime).                  |
 | `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                 |
 | `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models.                                   |
-| `-t, --test-objects=<objectForTest>`       | Specifies a positive integer flag for testing custom-programmed algorithms. Must be > 0. Testing custom-programmed algorithms is restricted to Object IDs 5, 9, and 19. Default: 1. Syntax: `-t 1`. |
+| `-t, --test-objects=<objectForTest>`       | Enables testing of custom-programmed algorithms (like OTA). The flag requires and integer value > 0. Test mode is available for Object IDs 5, 9, and 19.  Syntax example: -t 1. |
 | `-aa, --additional-attributes`             | Additional attributes to send during registration (e.g., `-aa attr1=value1,attr2=value2`). |
 | `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap (same syntax as `-aa`).                                |
 | `-ocf, --support-old-format`               | Enable support for old/unofficial content formats.                                         |
