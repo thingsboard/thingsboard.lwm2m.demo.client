@@ -12,6 +12,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 ## General Options
 | Option | Description |
 |--------|-------------|
+| `-h, --help` | Display help information. |
 | `-u, --server-url` | Set the server URL. Defaults to `coap://localhost:5685` or `coaps://localhost:5686`. |
 | `-b, --bootstrap` | Use bootstrap mode instead of direct registration. |
 | `-n, --endpoint-name` | Set the endpoint name for the client. Default: hostname or `LeshanClientDemo`. |
@@ -23,6 +24,8 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap (same syntax as `-aa`). |
 | `-ocf, --support-old-format` | Enable support for old/unofficial content formats. |
 | `-jc, --use-java-coap` | Use Java-CoAP instead of Californium. |
+| `-V, --version` | Print version information and exit. |
+| `-v, --verbose` | Specify multiple `-v` options to increase verbosity. For example, `-v -v -v` or `-vvv`. |
 
 ## Location Options
 | Option | Description |
@@ -61,4 +64,5 @@ java -jar thingsboard-lw-demo-client.jar -m ./models
 - Custom LwM2M object models should be in OMA DDF format and placed in the specified directory.
 
 For further details, refer to the [ThingsBoard Documentation](https://thingsboard.io/docs/).
+
 
