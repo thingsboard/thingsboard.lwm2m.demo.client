@@ -14,23 +14,23 @@ java -jar thingsboard-lw-demo-client.jar [options]
 
 ## General Options
 
-| Option                                     | Description                                                                                |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `-h, --help`                               | Display help information.                                                                  |
-| `-V, --version`                            | Print version information and exit.                                                        |
+| Option                                     | Description                                                                                                                                                                                                                                |
+|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-h, --help`                               | Display help information.                                                                                                                                                                                                                  |
+| `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                        |
 | `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example, `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details. |
-| `-u, --server-url`                         | Set the server URL. Defaults to `coap://localhost:5685` or `coaps://localhost:5686`.       |
-| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                         |
-| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default: hostname or `LeshanClientDemo`.             |
-| `-l, --lifetime`                           | Registration lifetime in seconds (default: 300s).                                          |
-| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime).                  |
-| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                 |
-| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models.                                   |
-| `-t, --test-objects=<objectForTest>`       | Enables testing of custom-programmed algorithms (like OTA). Test mode is available for Object IDs 5, 9, and 19.  Syntax example: -t. |
-| `-aa, --additional-attributes`             | Additional attributes to send during registration (e.g., `-aa attr1=value1,attr2=value2`). |
-| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap (same syntax as `-aa`).                                |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats.                                         |
-| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium.                                                      |
+| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                 |
+| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                         |
+| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default: `-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                        |
+| `-l, --lifetime`                           | Registration lifetime in seconds (default: `-l 300` in sec).                                                                                                                                                                               |
+| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                              |
+| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                 |
+| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. For example: `-m /.` or `-m /models`or `-m /absolute_path`                                                                                                                        |
+| `-t, --test-objects`                       | Enables testing of custom-programmed algorithms (like OTA). Test mode is available for Object IDs 5, 9, and 19.  Syntax example: `-t`.                                                                                                     |
+| `-aa, --additional-attributes`             | Additional attributes to send during registration (e.g., `-aa attr1=value1,attr2=value2`).                                                                                                                                                 |
+| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap (same syntax as `-aa`).                                                                                                                                                                                |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats.                                                                                                                                                                                         |
+| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium.                                                                                                                                                                                                      |
 
 ## Location Options
 
