@@ -66,7 +66,9 @@ java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyCli
 ### Use object models from a custom folder:
 
 ```sh
+java -jar thingsboard-lw-demo-client.jar -m ./
 java -jar thingsboard-lw-demo-client.jar -m ./models
+java -jar thingsboard-lw-demo-client.jar -m /absolute_path
 ```
 
 ## Notes
