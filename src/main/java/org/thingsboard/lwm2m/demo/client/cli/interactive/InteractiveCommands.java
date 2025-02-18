@@ -62,10 +62,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Interactive commands for the Leshan Client Demo
+ * Interactive commands for the Thingsboard Lwm2m Demo Client
  */
 @Command(name = "",
-         description = "@|bold,underline Leshan Client Demo Interactive Console :|@%n",
+         description = "@|bold,underline Thingsboard Lwm2m Demo Client Interactive Console :|@%n",
          footer = { "%n@|italic Press Ctl-C to exit.|@%n" },
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
                  UpdateCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class },

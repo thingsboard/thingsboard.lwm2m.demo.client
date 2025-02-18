@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.thingsboard.lwm2m.demo.client.cli;
 
-import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
 import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.demo.cli.MultiParameterException;
@@ -46,13 +45,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This is the class defining the Command Line Interface of Leshan Client Demo.
+ * This is the class defining the Command Line Interface of Thingsboard Lwm2m Demo Cliento.
  */
 @Command(name = "thingsboard-lw-demo-client",
          sortOptions = false,
          description = "%n"//
                  + "@|italic " //
-                 + "This is a LWM2M client demo implemented with Leshan library.%n" //
+                 + "This is Thingsboard Lwm2m Demo Client implemented with Leshan library.%n" //
                  + "You can launch it without any option and it will try to register to a LWM2M server at " + "coap://"
                  + ClientDemoCLI.DEFAULT_COAP_URL + ".%n" //
                  + "%n" //
@@ -189,12 +188,11 @@ public class ClientDemoCLI implements Runnable {
         @Option(names = { "-t", "--test-objects" },
                 description = { //
                         "Enables testing of custom-programmed algorithms (like OTA). ", //
-                        "The flag requires and integer value > 0.", //
                         "Test mode is available for Object IDs 5, 9, and 19.", //
                         "Syntax example:", //
-                        "-t 1", //
+                        "-t", //
                 })
-        public int objectForTest;
+        public boolean objectForTest;
     }
 
     /* ********************************** Location Section ******************************** */

@@ -119,7 +119,7 @@ public class ThingsboardLwDemoCient {
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
     private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
-    private static final String CF_CONFIGURATION_HEADER = "Leshan Client Demo - " + Configuration.DEFAULT_HEADER;
+    private static final String CF_CONFIGURATION_HEADER = "Thingsboard Lwm2m Demo Client - " + Configuration.DEFAULT_HEADER;
 
     public static void main(String[] args) {
 
@@ -186,7 +186,7 @@ public class ThingsboardLwDemoCient {
     }
 
     public static LeshanClient createClient(ClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
-        // create Leshan client from command line option
+        // create Thingsboard Lwm2m Demo Client from command line option
         final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
                 cli.location.position.longitude, cli.location.scaleFactor);
 

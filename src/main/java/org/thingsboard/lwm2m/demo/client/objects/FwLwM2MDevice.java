@@ -49,7 +49,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private final AtomicInteger updateResult = new AtomicInteger(0);
     private final Timer timer;
-    private int objectForTest;
+    private boolean objectForTest;
 
     public FwLwM2MDevice() {
         // notify new date each 5 second
@@ -62,7 +62,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         }, 5000, 5000);
     }
 
-    public FwLwM2MDevice(int objectForTest) {
+    public FwLwM2MDevice(boolean objectForTest) {
         this.objectForTest = objectForTest;
         // notify new date each 5 second
         this.timer = new Timer("5 - Device-Current Time");
@@ -104,7 +104,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
         switch (resourceId) {
             case 2:
-                if (this.objectForTest > 0) {
+                if (this.objectForTest) {
                     startUpdating();
                 }
                 return ExecuteResponse.success();
@@ -120,7 +120,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         switch (resourceId) {
             case 0:
             case 1:
-                if (this.objectForTest > 0) {
+                if (this.objectForTest) {
                     startDownloading();
                 }
                 return WriteResponse.success();
