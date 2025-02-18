@@ -87,6 +87,31 @@ To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo 
 
 ### More logs on ThingsBoard LwM2M Demo Client
 
+After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv` 
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClient -v
+```
+
+1. Enables you to execute some dynamic commands from the Interactive Console.
+
+| Commands: | Description                                    |
+|-----------| ---------------------------------------------- |
+| `help`    | Display help information about the specified command.      |
+| `list`    | List available Objects, Instances and Resources |
+| `create`  | Enable a new Object |
+| `delete`  |  Send data to server |
+| `send`   | Enable support for deprecated cipher suites    |
+| `collect`   | Collect data to send it later with 'send' command |
+| `move`   | Simulate client mouvement |
+
+2. Depending on the number of "v" elements, the logging level for the "org.eclipse.leshan", "org.eclipse.californium" classes is set:
+
+- "v"    - INFO
+- "vv"   - DEBUG
+- "vvv"  - TRACE
+- "vvvv" - TRACE + Logger.ROOT_LOGGER_NAME (TRACE)
+
 You could also try to activate more logs on the hingsBoard LwM2M Demo Client by adding this to your command line:
 
 ```sh
