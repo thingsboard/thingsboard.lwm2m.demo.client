@@ -188,11 +188,10 @@ public class ClientDemoCLI implements Runnable {
 
         @Option(names = { "-t", "--test-objects" },
                 description = { //
-                        "Specifies a positive integer flag for testing custom-programmed algorithms. Must be > 0.", //
-                        "!!! The value for -t must be greater than 0.", //
-                        "Testing custom-programmed algorithms is restricted to Object IDs 5, 9, and 19.", //
-                        "Default : 1", //
-                        "syntax is :", //
+                        "Enables testing of custom-programmed algorithms (like OTA). ", //
+                        "The flag requires and integer value > 0.", //
+                        "Test mode is available for Object IDs 5, 9, and 19.", //
+                        "Syntax example:", //
                         "-t 1", //
                 })
         public int objectForTest;
