@@ -83,11 +83,11 @@ This program uses [SLF4J](https://en.wikipedia.org/wiki/SLF4J) as a logging faca
 
 Our demos use the [logback](https://logback.qos.ch/) backend. Since 2.0.0-M5, a verbosity option (`-v, -vv`, ...) allows changing the log level.
 
-To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo Client](#more-logs-on-thingsboard-lw-demo-client) or read the logback documentation.
+To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo Client](#more-logs-on-thingsboard-lw-demo-client) or read the [logback documentation](https://logback.qos.ch/manual/configuration.html).
 
 ### More logs on ThingsBoard LwM2M Demo Client
 
-You could also try to activate more logs on the Leshan demo by adding this to your command line:
+You could also try to activate more logs on the hingsBoard LwM2M Demo Client by adding this to your command line:
 
 ```sh
 -Dlogback.configurationFile="path_to_your_logback_config.xml"
@@ -96,7 +96,7 @@ You could also try to activate more logs on the Leshan demo by adding this to yo
 Example:
 
 ```sh
-java -Dlogback.configurationFile="logback-config.xml" -jar target/leshan-server-demo-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+java -Dlogback.configurationFile="logback-config.xml" -jar target/lthingsboard-lw-demo-client-{version}.jar
 ```
 
 And in your logback config:
