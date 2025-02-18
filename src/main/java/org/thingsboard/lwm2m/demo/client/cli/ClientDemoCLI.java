@@ -69,7 +69,7 @@ public class ClientDemoCLI implements Runnable {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            return "ThingsboardClientDemo";
+            return "ThingsboardLwm2mClientDemo";
         }
     }
 
@@ -98,7 +98,7 @@ public class ClientDemoCLI implements Runnable {
         @Option(names = { "-n", "--endpoint-name" },
                 description = { //
                         "Set the endpoint name of the Client.", //
-                        "Default the hostname or 'LeshanClientDemo' if no hostname." })
+                        "Default the hostname or 'ThingsboardLwm2mClientDemo' if no hostname." })
         public String endpoint = ClientDemoCLI.defaultEndpoint();
 
         @Option(names = { "-l", "--lifetime" },

@@ -198,7 +198,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     /**
      * A command to delete object enabler.
      */
-    @Command(name = "delete", description = "Disable a new object", headerHeading = "%n", footer = "")
+    @Command(name = "delete", description = "Disable a Object", headerHeading = "%n", footer = "")
     static class DeleteCommand implements Runnable {
 
         @Parameters(description = "Id of the LWM2M object to enable")
