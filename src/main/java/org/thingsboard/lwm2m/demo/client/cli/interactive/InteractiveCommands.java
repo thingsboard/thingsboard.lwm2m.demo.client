@@ -39,6 +39,8 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendResponse;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.RebootCommand;
+import org.thingsboard.lwm2m.demo.client.objects.MyDevice;
 import org.thingsboard.lwm2m.demo.client.objects.MyLocation;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CollectCommand;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CreateCommand;
@@ -68,7 +70,7 @@ import java.util.Map;
          description = "@|bold,underline Thingsboard Lwm2m Demo Client Interactive Console :|@%n",
          footer = { "%n@|italic Press Ctl-C to exit.|@%n" },
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
-                 UpdateCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class },
+                 UpdateCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
          customSynopsis = { "" },
          synopsisHeading = "")
 public class InteractiveCommands extends JLineInteractiveCommands implements Runnable {
@@ -136,7 +138,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
             ObjectModel objectModel = objectEnabler.getObjectModel();
             objectEnabler.getAvailableInstanceIds().forEach(instance -> {
                 parent.printfAnsi("@|bold,fg(magenta) /%d/%d : |@ @|bold,fg(green) %s |@ %n", objectModel.id, instance,
-                        objectModel.name);
+                        objectModel.name + " [Object v" + objectModel.version + "]");
                 List<Integer> availableResources = objectEnabler.getAvailableResourceIds(instance);
                 availableResources.forEach(resourceId -> {
                     ResourceModel resourceModel = objectModel.resources.get(resourceId);
@@ -233,7 +235,32 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     }
 
     /**
-     * A command to sebd data.
+     * A command to restart client.
+     */
+    @Command(name = "reboot",
+            description = "Restart client without update object.",
+            headerHeading = "%n",
+            footer = "",
+            sortOptions = false)
+    static class RebootCommand implements Runnable {
+
+        @ParentCommand
+        InteractiveCommands parent;
+        @Override
+        public void run() {
+            LwM2mObjectEnabler objectEnabler = parent.client.getObjectTree().getObjectEnabler(LwM2mId.DEVICE);
+            if (objectEnabler != null && objectEnabler instanceof ObjectEnabler) {
+                LwM2mInstanceEnabler instance = ((ObjectEnabler) objectEnabler).getInstance(0);
+                if (instance instanceof MyDevice) {
+                    MyDevice device = (MyDevice) instance;
+                    device.triggerRebootClient();
+                }
+            }
+        }
+    }
+
+    /**
+     * A command to send data.
      */
     @Command(name = "send",
              description = "Send data to server",

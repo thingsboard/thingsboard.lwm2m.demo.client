@@ -139,13 +139,6 @@ public class ThingsboardLwDemoCient {
             LwM2mModelRepository repository = createModel(cli);
             final LeshanClient client = createClient(cli, repository);
 
-            // Print commands help
-            InteractiveCLI console = new InteractiveCLI(new InteractiveCommands(client, repository));
-            console.showHelp();
-
-            // Start the client
-            client.start();
-
             // De-register on shutdown and stop client.
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
@@ -154,8 +147,19 @@ public class ThingsboardLwDemoCient {
                 }
             });
 
-            // Start interactive console
-            console.start();
+            if (cli.helpsOptions.getVerboseLevel() > 0) {
+                // Print commands help
+                InteractiveCLI console = new InteractiveCLI(new InteractiveCommands(client, repository));
+                console.showHelp();
+
+                // Start the client
+                client.start();
+                // Start interactive console
+                console.start();
+            } else {
+                // Start the client without Interactive console
+                client.start();
+            }
 
         } catch (Exception e) {
 

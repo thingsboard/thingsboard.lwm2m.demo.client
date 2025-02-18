@@ -115,17 +115,7 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
         LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceid, withArguments);
 
         if (resourceid == 4) {
-            new Timer("Reboot Lwm2mClient").schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    getLwM2mClient().stop(true);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                    }
-                    getLwM2mClient().start();
-                }
-            }, 500);
+            this.triggerRebootClient();
         }
         return ExecuteResponse.success();
     }
@@ -229,6 +219,20 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public List<Integer> getAvailableResourceIds(ObjectModel model) {
         return supportedResources;
+    }
+
+    public void triggerRebootClient() {
+        new Timer("Reboot Lwm2mClient").schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getLwM2mClient().stop(true);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+                getLwM2mClient().start();
+            }
+        }, 500);
     }
 
     @Override

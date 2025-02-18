@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This is the class defining the Command Line Interface of Thingsboard Lwm2m Demo Cliento.
+ * This is the class defining the Command Line Interface of Thingsboard Lwm2m Client Demo.
  */
 @Command(name = "thingsboard-lw-demo-client",
          sortOptions = false,
