@@ -25,7 +25,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-ocf, --support-old-format` | Enable support for old/unofficial content formats. |
 | `-jc, --use-java-coap` | Use Java-CoAP instead of Californium. |
 | `-V, --version` | Print version information and exit. |
-| `-v, --verbose` | Specify multiple `-v` options to increase verbosity. For example, `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [FAQ](https://github.com/eclipse/leshan/wiki/F.A.Q./) for details. |
+| `-v, --verbose` | Specify multiple `-v` options to increase verbosity. For example, `-v -v -v` or `-vvv`. |
 
 ## Location Options
 | Option | Description |
