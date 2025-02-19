@@ -55,8 +55,8 @@ I. If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
 
 ```markdown
 `-pos 34.122222:118.4111111`
-_this.latitude_ = *latitude* + `90f`;
-_this.latitude_ = `124.122222`;
+this.latitude = `latitude` + `90f`;
+this.latitude = `124.122222`;
 ```
 
 II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are null
@@ -65,18 +65,12 @@ II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are null
 
 2. RANDOM.nextInt(360) for longitude
 * a random value between 0 and 359 is generated, matching the adjusted [0, 360] range.
-
+* 
 ```markdown
-`-pos 34.122222:118.4111111`  
-this.longitude = <span style="color: blue;">longitude</span> + <code>180f</code>;  
-this.longitude = <span style="color: blue;">298.4111111</span>; 
+`-pos 34.122222:118.4111111`
+this.longitude = `longitude` + `180f`;
+this.longitude = `298.4111111`;
 ```
-
-
-`-pos 34.122222:118.4111111`  
-this.longitude = <span style="color: blue;">longitude</span> + <code>180f</code>;  
-this.longitude = <span style="color: blue;">298.4111111</span>; 
-
 
 ### sf
 ```markdown
