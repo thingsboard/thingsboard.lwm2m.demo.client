@@ -45,6 +45,7 @@ In the **ThingsBoard LwM2M Demo Client**, _atitude_ and _longitude_ values are a
 
 #### Explanation of each case:
 When the application is started, it is created in LeshanClient:
+
 I. If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
 1. _latitude_ + `90f`
 * Latitude values typically range from -90 to +90 degrees.
