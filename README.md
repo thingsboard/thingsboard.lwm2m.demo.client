@@ -39,17 +39,16 @@ java -jar thingsboard-lw-demo-client.jar [options]
 ```sh
 java -jar thingsboard-lw-demo-client.jar -m ./
 java -jar thingsboard-lw-demo-client.jar -m ./models
-java -jar thingsboard-lw-demo-client.jar -m /absolute_path
+java -jar thingsboard-lw-demo-client.jar -m /absolute_path/models
 ```
-
 
 ### Use ota from a custom folder:
 
 [OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates)
 ```sh
-java -jar thingsboard-lw-demo-client.jar -m ./
-java -jar thingsboard-lw-demo-client.jar -m ./models
-java -jar thingsboard-lw-demo-client.jar -m /absolute_path
+java -jar thingsboard-lw-demo-client.jar -o ./
+java -jar thingsboard-lw-demo-client.jar -o ./ota
+java -jar thingsboard-lw-demo-client.jar -o /absolute_path/ota
 ```
 
 ## Location Options
@@ -75,6 +74,8 @@ When the application is started, it is created in LeshanClient:
 `-pos 34.122222:118.4111111`
 this.latitude = `latitude` + `90f`;
 this.latitude = `124.122222`;
+this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `1.0`;
 ```
 
 2. _longitude_ + `180f`
@@ -85,18 +86,53 @@ this.latitude = `124.122222`;
 `-pos 34.122222:118.4111111`
 this.longitude = `longitude` + `180f`;
 this.longitude = `298.4111111`;
+this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `1.0`;
 ```
 
 *II.* if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are  *`null`*
 1. RANDOM.nextInt(180) for latitude
 * a random value between 0 and 179 is assigned, keeping it within the adjusted [0, 180] range.
+* 
+```markdown
+`-sf 3.0`
+this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `3.0`;
+this.latitude = RANDOM.nextInt(`180`);
+this.latitude = `20.0`;
+```
 
 2. RANDOM.nextInt(360) for longitude
 * a random value between 0 and 359 is generated, matching the adjusted [0, 360] range.
 
-### sf
 ```markdown
+`-sf 3.0`
 this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `3.0`;
+this.longitude = RANDOM.nextInt(`360`);
+this.longitude = `140.0`;
+```
+
+### sf
+
+```markdown
+`-sf 3.0`
+this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `3.0`;
+this.latitude = RANDOM.nextInt(`180`);
+this.latitude = `20.0`;
+this.longitude = RANDOM.nextInt(`360`);
+this.longitude = `140.0`;
+```
+
+```markdown
+`-pos 34.122222:118.4111111 -sf 2.0`
+this.scaleFactor = `scaleFactor`;
+this.scaleFactor = `3.0`;
+this.latitude = `latitude` + `90f`;
+this.latitude = `124.122222`;
+this.longitude = `longitude` + `180f`;
+this.longitude = `298.4111111`;
 ```
 
 ## DTLS (Security) Options
