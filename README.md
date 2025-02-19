@@ -196,7 +196,7 @@ CID is used in DTLS 1.2 and 1.3 to maintain secure communication sessions even w
 
 _Possible Values for **`-cid`**_:
 
-* Any positive integer (cid > 0) is valid.
+* Any positive integer (`cid > 0`) is valid.
 * The value typically represents the CID length (`number of bytes`).
 * Common values: `1, 2, 4, 8, 16` (depends on DTLS implementation).
 
