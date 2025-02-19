@@ -188,19 +188,19 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
 ```
 
-_``What is `-cid`?``_
+_What is **`-cid`**?_
 
 The -cid (Connection ID) option enables DTLS Connection ID (CID) support.
 
 CID is used in DTLS 1.2 and 1.3 to maintain secure communication sessions even when the underlying transport (e.g., UDP) changes.
 
-**Possible Values for `-cid`**:
+_Possible Values for **`-cid`**_:
 
 * Any positive integer (cid > 0) is valid.
 * The value typically represents the CID length (`number of bytes`).
 * Common values: `1, 2, 4, 8, 16` (depends on DTLS implementation).
 
-**What Does CID Affect?**
+_What Does **`-cid`** Affect?_
 
 * Maintains DTLS session continuity. Normally, DTLS relies on IP+Port for session tracking. If a device changes network (e.g., mobile IP change), CID allows the session to persist.
 * Reduces DTLS handshake overhead. Without CID, losing connection means a full DTLS handshake is required again. With CID, the session is resumed, saving time and resources.
