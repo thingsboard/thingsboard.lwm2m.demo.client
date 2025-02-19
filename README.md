@@ -49,14 +49,21 @@ I. If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
 1. _latitude_ + `90f`
 * Latitude values typically range from -90 to +90 degrees.
 * Adding 90f shifts this range to [0, 180], possibly to avoid negative values and simplify storage.
+
+```markdown
+`-pos 34.122222:118.4111111`
+this.latitude = `latitude` + `90f`;
+this.latitude = `124.122222`;
+```
+
 2. _longitude_ + `180f`
 * Longitude values usually range from -180 to +180 degrees.
 * Adding 180f shifts this range to [0, 360], ensuring only positive values are stored.
 
 ```markdown
 `-pos 34.122222:118.4111111`
-this.latitude = `latitude` + `90f`;
-this.latitude = `124.122222`;
+this.longitude = `longitude` + `180f`;
+this.longitude = `298.4111111`;
 ```
 
 II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are null
@@ -65,16 +72,10 @@ II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are null
 
 2. RANDOM.nextInt(360) for longitude
 * a random value between 0 and 359 is generated, matching the adjusted [0, 360] range.
-* 
-```markdown
-`-pos 34.122222:118.4111111`
-this.longitude = `longitude` + `180f`;
-this.longitude = `298.4111111`;
-```
 
 ### sf
 ```markdown
-this._scaleFactor_ = *scaleFactor*;
+this.scaleFactor = `scaleFactor`;
 ```
 
 ## DTLS (Security) Options
@@ -140,7 +141,7 @@ To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo 
 
 ### More logs on ThingsBoard LwM2M Demo Client
 
-#### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv` 
+#### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`
 
 ```sh
 java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClient -v
@@ -206,6 +207,6 @@ And in your logback config:
 
 * `-w` or `north` - Move to the North, For example: `move -w5`, result in objectId = 6 (MyLocation): _latitude_ = **latitude** + 1.0f * **scaleFactor**;
 * `-a` or `east` - Move to the East.
-* `-s` or `south` Move to the South.  
+* `-s` or `south` Move to the South.
 * `-d` or `west` Move to the West. 
 
