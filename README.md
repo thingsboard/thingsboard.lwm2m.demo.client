@@ -46,7 +46,7 @@ In the **ThingsBoard LwM2M Demo Client**, _atitude_ and _longitude_ values are a
 #### Explanation of each case:
 When the application is started, it is created in LeshanClient:
 
-I. If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
+*I.* If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
 1. _latitude_ + `90f`
 * Latitude values typically range from -90 to +90 degrees.
 * Adding 90f shifts this range to [0, 180], possibly to avoid negative values and simplify storage.
@@ -67,7 +67,7 @@ this.longitude = `longitude` + `180f`;
 this.longitude = `298.4111111`;
 ```
 
-II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are  *`null`*
+*II.* if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are  *`null`*
 1. RANDOM.nextInt(180) for latitude
 * a random value between 0 and 179 is assigned, keeping it within the adjusted [0, 180] range.
 
