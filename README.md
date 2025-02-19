@@ -188,7 +188,7 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
 ```
 
-**What is -cid?**
+_``What is `-cid`?``_
 
 The -cid (Connection ID) option enables DTLS Connection ID (CID) support.
 
