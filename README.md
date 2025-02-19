@@ -32,6 +32,15 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                 |
 | `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example: `-jc`.                                                                                                                                                                               |
 
+
+### Use object models from a custom folder:
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -m ./
+java -jar thingsboard-lw-demo-client.jar -m ./models
+java -jar thingsboard-lw-demo-client.jar -m /absolute_path
+```
+
 ## Location Options
 
 | Option                     | Description                                                                                                                                      |
@@ -97,7 +106,7 @@ this.scaleFactor = `scaleFactor`;
 java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
-### Register with the ThingsBoard server (mode with DTLS):
+#### Register with the ThingsBoard server (mode with DTLS):
 
 | Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
 |--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -111,13 +120,13 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 | `-cu, --certificate-usage`     | Certificate Usage (as integer) defining how to use server certificate",  - 0 : CA constraint";  - 1 : service certificate constraint; - 2 : trust anchor assertion"; - 3 : domain issued certificate (Default value) [Usage are described at](https://tools.ietf.org/html/rfc6698#section-2.1.1)                                                                                                                                    |
 | `-ts, --truststore`            | The path to  : ", - a root certificate file to trust, - OR a folder containing trusted certificates, - OR trust store URI; Certificates must be in in X509v3 format (DER encoding); URI format:  file://<path-to-store>#<password>#<alias-pattern> Where :  - path-to-store is path to pkcs12 trust store file, - alias-pattern can be used to filter trusted certificates and can also be empty to get all,  Default: empty store. |
 
-#### Use DTLS with PSK authentication:
+##### Use DTLS with PSK authentication:
 
 ```sh
 java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
 ```
 
-#### Use DTLS with RPK authentication:
+##### Use DTLS with RPK authentication:
 
 Use CoAP over DTLS with Raw Public Key, -cpubk -cprik -spubk options should be used together. [RPK](https://github.com/eclipse/leshan/wiki/Credential-files-format)
 
@@ -125,18 +134,10 @@ Use CoAP over DTLS with Raw Public Key, -cpubk -cprik -spubk options should be u
 java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
 ```
 
-#### Use DTLS with X509 authentication:
+##### Use DTLS with X509 authentication:
 
 ```sh
 java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2 
-```
-
-### Use object models from a custom folder:
-
-```sh
-java -jar thingsboard-lw-demo-client.jar -m ./
-java -jar thingsboard-lw-demo-client.jar -m ./models
-java -jar thingsboard-lw-demo-client.jar -m /absolute_path
 ```
 
 ## Notes
