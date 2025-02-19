@@ -44,12 +44,39 @@ java -jar thingsboard-lw-demo-client.jar -m /absolute_path/models
 
 ### Use ota from a custom folder:
 
-[OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates)
 ```sh
 java -jar thingsboard-lw-demo-client.jar -o ./
 java -jar thingsboard-lw-demo-client.jar -o ./ota
 java -jar thingsboard-lw-demo-client.jar -o /absolute_path/ota
 ```
+
+[OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates).
+
+Example update FW:
+* Title: `fw_test`
+* Version: `1.1`
+* Tag: `fw_test 1.1`
+* FilePath: `./ota`
+* File: `otaPackage.bin`
+
+Example file settings current FW for ThingsBoard LwM2M Demo Client (format json), according to the specified location  `-o ./ota:`
+
+```json5
+{
+    "title": "fw_test",
+    "version": "1.1",
+    "filePath": "./ota",
+    "file": "otaPackage.bin",
+    "checksum": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
+    "fileSize": 8283052
+    
+}
+```
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -o ./ota
+```
+
 
 ## Location Options
 
@@ -273,3 +300,66 @@ And in your logback config:
 * `-e` or `east` - Move to the East, For example: `move -e`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `-1.0f` * **scaleFactor**;
 * `-s` or `south` Move to the South, For example: `move -s`, result in objectId = 6 (MyLocation): _latitude_ = **latitude** + `-1.0f` * **scaleFactor**;
 * `-w` or `west` Move to the West, For example: `move -w`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `1.0f` * **scaleFactor**;
+
+#### send
+
+Explanation:
+
+**send** → Sends data to the server.
+*/3303/0/5700*=`25.3` → Specifies the LwM2M resource to update:
+
+| Params: | Description                           |
+|---------|---------------------------------------|
+| `3303`  | Object ID (Temperature Sensor).       |
+| `0`     | Instance ID.                          |
+| `5700`  | Resource ID (Sensor Value).           |
+| `25.3`  | New value for the resource.           |
+
+
+```sh
+send `/3303/0/5700=25.3`
+```
+
+This updates multiple resources at once:
+
+| Params:              | Description                                            |
+|----------------------|--------------------------------------------------------|
+| `/3323/1/5601=10.5`  | Updates Min Value for Object 3323 (Power Measurement). |
+| `/3323/1/5602=50.8`  | Updates Max Value.                                     |
+
+
+```sh
+send /3323/1/5601=10.5 /3323/1/5602=50.8
+```
+
+#### collect
+
+After collecting the data, use the send command to transmit all stored values.
+
+Explanation:
+
+**collect** → Stores the specified value without immediately sending it to the server.
+*/3303/0/5700*=`22.5` → Specifies the LwM2M resource to collect:
+
+| Params: | Description                           |
+|---------|---------------------------------------|
+| `3303`  | Object ID (Temperature Sensor).       |
+| `0`     | Instance ID.                          |
+| `5700`  | Resource ID (Sensor Value).           |
+| `22.5`  | New value for the resource.           |
+
+
+```sh
+collect /3303/0/5700=22.5
+send
+```
+
+```sh
+collect /3323/1/5601=15.7
+collect /3323/1/5602=48.2
+send
+```
+**This sequence:**
+* _Collects_ `15.7` as the Min Value for Power Measurement.
+* _Collects_ `48.2` as the Max Value for Power Measurement.
+* _Sends_ `all` collected `values at once`.
