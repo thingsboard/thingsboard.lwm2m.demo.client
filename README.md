@@ -222,7 +222,7 @@ And in your logback config:
 
 #### move
 
-* `-d` or `north` - Move to the North, For example: `move -w`, result in objectId = 6 (MyLocation): _latitude_ = **latitude** + `1.0f` * **scaleFactor**;
-* `-a` or `east` - Move to the East, For example: `move -a`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `-1.0f` * **scaleFactor**;
+* `-d` or `north` - Move to the North, For example: `move -d`, result in objectId = 6 (MyLocation): _latitude_ = **latitude** + `1.0f` * **scaleFactor**;
+* `-e` or `east` - Move to the East, For example: `move -e`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `-1.0f` * **scaleFactor**;
 * `-s` or `south` Move to the South, For example: `move -s`, result in objectId = 6 (MyLocation): _latitude_ = **latitude** + `-1.0f` * **scaleFactor**;
-* `-w` or `west` Move to the West, For example: `move -a`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `1.0f` * **scaleFactor**;
+* `-w` or `west` Move to the West, For example: `move -w`, result in objectId = 6 (MyLocation): _longitude_ = **longitude** + `1.0f` * **scaleFactor**;
