@@ -94,7 +94,7 @@ this.scaleFactor = `scaleFactor`;
 #### Register with the ThingsBoard server (mode NoSec):
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClient
+java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 ### Register with the ThingsBoard server (mode with DTLS):
@@ -105,6 +105,7 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 | `-p, --psk-key`                | Set the LWM2M or Bootstrap server Pre-Shared-Key in hexa.                                                                                                                                                                                                                                                                                                                                                                           |
 | `-cprik, --client-private-key` | The path to your client private key file, The private key should be in PKCS#8 format (DER encoding).                                                                                                                                                                                                                                                                                                                                |
 | `-cpubk, --client-public-key`  | The path to your client public key file. The public Key should be in SubjectPublicKeyInfo format (DER encoding).                                                                                                                                                                                                                                                                                                                    |
+| `-spubk, --server-public-key`  | "The path to your server public key file. The public Key should be in SubjectPublicKeyInfo format (DER encoding).                                                                                                                                                                                                                                                                                                                   |
 | `-ccert, --client-certificate` | The path to your client certificate file.", The certificate Common Name (CN) should generaly be equal to the client endpoint name (see -n option).", The certificate should be in X509v3 format (DER encoding).                                                                                                                                                                                                                     |
 | `-scert, --server-certificate` | The path to your server certificate file (see -certificate-usage option). The certificate should be in X509v3 format (DER encoding).                                                                                                                                                                                                                                                                                                |
 | `-cu, --certificate-usage`     | Certificate Usage (as integer) defining how to use server certificate",  - 0 : CA constraint";  - 1 : service certificate constraint; - 2 : trust anchor assertion"; - 3 : domain issued certificate (Default value) [Usage are described at](https://tools.ietf.org/html/rfc6698#section-2.1.1)                                                                                                                                    |
@@ -113,19 +114,21 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 #### Use DTLS with PSK authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClient --psk-identity myIdentity --psk-key mySecret
+java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
 ```
 
 #### Use DTLS with RPK authentication:
 
+Use CoAP over DTLS with Raw Public Key, -cpubk -cprik -spubk options should be used together. [RPK](https://github.com/eclipse/leshan/wiki/Credential-files-format)
+
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClient --psk-identity myIdentity --psk-key mySecret
+java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
 ```
 
 #### Use DTLS with X509 authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClient --psk-identity myIdentity --psk-key mySecret
+java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2 
 ```
 
 ### Use object models from a custom folder:
