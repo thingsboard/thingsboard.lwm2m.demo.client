@@ -66,7 +66,7 @@ this.longitude = `longitude` + `180f`;
 this.longitude = `298.4111111`;
 ```
 
-II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are null
+II. if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are  <span style="color: red; font-weight: bold;">null</span>
 1. RANDOM.nextInt(180) for latitude
 * a random value between 0 and 179 is assigned, keeping it within the adjusted [0, 180] range.
 
