@@ -394,16 +394,16 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         @ParentCommand
         InteractiveCommands parent;
 
-        @Option(names = { "-w", "north" }, description = "Move to the North")
+        @Option(names = { "-d", "north" }, description = "Move to the North")
         boolean north;
 
-        @Option(names = { "-a", "east" }, description = "Move to the East")
+        @Option(names = { "-e", "east" }, description = "Move to the East")
         boolean east;
 
         @Option(names = { "-s", "south" }, description = "Move to the South")
         boolean south;
 
-        @Option(names = { "-d", "west" }, description = "Move to the West")
+        @Option(names = { "-w", "west" }, description = "Move to the West")
         boolean west;
 
         @Override
@@ -414,13 +414,13 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
                 if (instance instanceof MyLocation) {
                     MyLocation location = (MyLocation) instance;
                     if (north)
-                        location.moveLocation("w");
+                        location.moveLocation("d");
                     if (east)
-                        location.moveLocation("a");
+                        location.moveLocation("e");
                     if (south)
                         location.moveLocation("s");
                     if (west)
-                        location.moveLocation("d");
+                        location.moveLocation("w");
                 }
             }
         }
