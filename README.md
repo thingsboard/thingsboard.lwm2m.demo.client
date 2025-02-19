@@ -329,7 +329,7 @@ This updates multiple resources at once:
 
 
 ```sh
-send `/3323/1/5601=10.5` `/3323/1/5602=50.8`
+send /3323/1/5601=10.5 /3323/1/5602=50.8
 ```
 
 #### collect
@@ -350,13 +350,13 @@ Explanation:
 
 
 ```sh
-collect `/3303/0/5700=22.5`
+collect /3303/0/5700=22.5
 send
 ```
 
 ```sh
-collect `/3323/1/5601=15.7`
-collect `/3323/1/5602=48.2`
+collect /3323/1/5601=15.7
+collect /3323/1/5602=48.2
 send
 ```
 **This sequence:**
