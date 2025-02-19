@@ -30,7 +30,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-t, --test-objects`                       | Enables testing of custom-programmed algorithms (like OTA). Test mode is available for Object IDs 5, 9, and 19.  Syntax example: `-t`.                                                                                                     |
 | `-aa, --additional-attributes`             | Additional attributes to send during registration. For example: `-aa attr1=value1,attr2=value2`.                                                                                                                                           |
 | `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example: `-bsaa attr1=value1,attr2=value2`.                                                                                                                                                    |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                 |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example: `-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                         |
 | `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example: `-jc`.                                                                                                                                                                               |
 
 
@@ -164,15 +164,51 @@ this.longitude = `298.4111111`;
 
 ## DTLS (Security) Options
 
-| Option                              | Description                                       |
-|-------------------------------------|---------------------------------------------------|
-| `-r, --rehanshake-on-update`        | Force rehandshake on registration update.         |
-| `-f, --force-full-handshake`        | Always perform a full DTLS handshake.             |
-| `-cid, --connection-id`             | Enable DTLS connection ID (default: off).         |
-| `-c, --cipher-suites`               | List of cipher suites to use (comma-separated).   |
-| `-oc, --support-deprecated-ciphers` | Enable support for deprecated cipher suites.      |
+| Option                              | Description                                                                                                                                                                                                                                                                                                      |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-r, --rehanshake-on-update`        | Force rehandshake on registration update. Syntax example: `r`.                                                                                                                                                                                                                                                   |
+| `-f, --force-full-handshake`        | By default client will try to resume DTLS session by using abbreviated Handshake. This option force to always do a full handshake. Syntax example: `f`.                                                                                                                                                          |
+| `-cid, --connection-id`             | Enable DTLS connection ID (default: off). Control usage of DTLS connection ID: - 'on' to activate Connection ID support (same as -cid 0); - 'off' to deactivate it; - Positive value define the size in byte of CID generated;  0 value means we accept to use CID but will not generated one for foreign peer." |
+| `-c, --cipher-suites`               | List of cipher suites to use (comma-separated). Define cipher suites to use. CipherCuite enum value separated by ',' without spaces. E.g: TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM.                                                                                                                   |
+| `-oc, --support-deprecated-ciphers` | Enable support for deprecated cipher suites. Syntax example: `-oc`.                                                                                                                                                                                                                                              |
 
 ### Example Commands
+#### Cipher suites to use
+
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
+```
+
+#### DTLS Connection ID (CID) support
+
+* - 'on' to activate Connection ID support (same as `-cid 0`). `0` value means we accept to use CID but will not generated one for foreign peer.
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
+```
+
+_What is **`-cid`**?_
+
+The -cid (Connection ID) option enables DTLS Connection ID (CID) support.
+
+CID is used in DTLS 1.2 and 1.3 to maintain secure communication sessions even when the underlying transport (e.g., UDP) changes.
+
+_Possible Values for **`-cid`**_:
+
+* Any positive integer (`cid > 0`) is valid.
+* The value typically represents the CID length (`number of bytes`).
+* Common values: `1, 2, 4, 8, 16` (depends on DTLS implementation).
+
+_What Does **`-cid`** Affect?_
+
+* Maintains DTLS session continuity. Normally, DTLS relies on IP+Port for session tracking. If a device changes network (e.g., mobile IP change), CID allows the session to persist.
+* Reduces DTLS handshake overhead. Without CID, losing connection means a full DTLS handshake is required again. With CID, the session is resumed, saving time and resources.
+* Security Considerations. A longer CID value increases uniqueness but adds packet overhead. Too short CID values (e.g., 1) might increase the risk of collisions.
+
+```sh
+java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 4
+```
 
 #### Register with the ThingsBoard server (mode NoSec):
 
@@ -339,6 +375,7 @@ After collecting the data, use the send command to transmit all stored values.
 Explanation:
 
 **collect** → Stores the specified value without immediately sending it to the server.
+
 */3303/0/5700*=`22.5` → Specifies the LwM2M resource to collect:
 
 | Params: | Description                           |
