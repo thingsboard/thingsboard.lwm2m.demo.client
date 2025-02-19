@@ -26,6 +26,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                              |
 | `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                 |
 | `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. [See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                            |
+| `-o, --ota-folder`                         | Path to a folder containing OMA DDF (XML) object models. [See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                |
 | `-t, --test-objects`                       | Enables testing of custom-programmed algorithms (like OTA). Test mode is available for Object IDs 5, 9, and 19.  Syntax example: `-t`.                                                                                                     |
 | `-aa, --additional-attributes`             | Additional attributes to send during registration. For example: `-aa attr1=value1,attr2=value2`.                                                                                                                                           |
 | `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example: `-bsaa attr1=value1,attr2=value2`.                                                                                                                                                    |
@@ -35,6 +36,16 @@ java -jar thingsboard-lw-demo-client.jar [options]
 
 ### Use object models from a custom folder:
 
+```sh
+java -jar thingsboard-lw-demo-client.jar -m ./
+java -jar thingsboard-lw-demo-client.jar -m ./models
+java -jar thingsboard-lw-demo-client.jar -m /absolute_path
+```
+
+
+### Use ota from a custom folder:
+
+[OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates)
 ```sh
 java -jar thingsboard-lw-demo-client.jar -m ./
 java -jar thingsboard-lw-demo-client.jar -m ./models
