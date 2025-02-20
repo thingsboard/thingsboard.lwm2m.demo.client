@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.thingsboard.lwm2m.demo.client.cli;
 
-import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
 import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.demo.cli.MultiParameterException;
@@ -46,13 +45,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This is the class defining the Command Line Interface of Leshan Client Demo.
+ * This is the class defining the Command Line Interface of Thingsboard Lwm2m Client Demo.
  */
 @Command(name = "thingsboard-lw-demo-client",
          sortOptions = false,
          description = "%n"//
                  + "@|italic " //
-                 + "This is a LWM2M client demo implemented with Leshan library.%n" //
+                 + "This is Thingsboard Lwm2m Demo Client implemented with Leshan library.%n" //
                  + "You can launch it without any option and it will try to register to a LWM2M server at " + "coap://"
                  + ClientDemoCLI.DEFAULT_COAP_URL + ".%n" //
                  + "%n" //
@@ -70,7 +69,7 @@ public class ClientDemoCLI implements Runnable {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            return "ThingsboardClientDemo";
+            return "ThingsboardLwm2mClientDemo";
         }
     }
 
@@ -99,7 +98,7 @@ public class ClientDemoCLI implements Runnable {
         @Option(names = { "-n", "--endpoint-name" },
                 description = { //
                         "Set the endpoint name of the Client.", //
-                        "Default the hostname or 'LeshanClientDemo' if no hostname." })
+                        "Default the hostname or 'ThingsboardLwm2mClientDemo' if no hostname." })
         public String endpoint = ClientDemoCLI.defaultEndpoint();
 
         @Option(names = { "-l", "--lifetime" },
@@ -131,7 +130,11 @@ public class ClientDemoCLI implements Runnable {
 
         @Option(names = { "-m", "--models-folder" },
                 description = { //
-                        "A folder which contains object models in OMA DDF(xml)format." })
+                        "A folder which contains object models in OMA DDF(xml)format.", //
+                        "syntax is :", //
+                        "-m ./", //
+                        "-m ./models", //
+                        "-m /absolute/path/to" })
         public File modelsFolder;
 
         @Option(names = { "-aa", "--additional-attributes" },
@@ -182,8 +185,14 @@ public class ClientDemoCLI implements Runnable {
                 })
         public Mode endpointNameMode = Mode.ALWAYS;
 
-        @Option(names = { "-t", "--uses-object-for-test" }, description = { "The client uses Object IDs: 5, 9, 19 to test custom-programmed algorithms." })
-        public int objectForTest;
+        @Option(names = { "-t", "--test-objects" },
+                description = { //
+                        "Enables testing of custom-programmed algorithms (like OTA). ", //
+                        "Test mode is available for Object IDs 5, 9, and 19.", //
+                        "Syntax example:", //
+                        "-t", //
+                })
+        public boolean objectForTest;
     }
 
     /* ********************************** Location Section ******************************** */

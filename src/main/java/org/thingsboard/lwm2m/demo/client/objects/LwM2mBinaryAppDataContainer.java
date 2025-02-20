@@ -79,7 +79,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
     private Integer appID = -1;
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 4, 5);
     private final Timer timer;
-    private int objectForTest;
+    private boolean objectForTest;
 
     public LwM2mBinaryAppDataContainer() {
         // notify new date each 5 second
@@ -93,7 +93,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
         }, 5000, 5000);
     }
 
-    public LwM2mBinaryAppDataContainer(Integer id, int objectForTest) {
+    public LwM2mBinaryAppDataContainer(Integer id, boolean objectForTest) {
         this.objectForTest = objectForTest;
         if (id != null) this.setId(id);
         // notify new date each 5 second

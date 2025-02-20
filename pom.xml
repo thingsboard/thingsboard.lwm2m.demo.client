@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
     <artifactId>thingsboard-lw-demo-client</artifactId>
-    <version>3.9.4</version>
+    <version>3.9.5</version>
     <name>thingsboard-demo-client</name>
     <description>thingsboard-lw-demo-client</description>
     <url/>
@@ -32,6 +32,7 @@
         <californium.version>4.0.0-M2</californium.version>
         <leshan.version>2.0.0-M15</leshan.version>
         <leshan-tl.version>2.0.0-M17</leshan-tl.version>
+        <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
     <dependencies>
         <dependency>

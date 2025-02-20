@@ -16,6 +16,7 @@
 package org.thingsboard.lwm2m.demo.client;
 
 import org.eclipse.leshan.core.demo.LeshanProperties;
+import org.thingsboard.lwm2m.demo.client.cli.AppProperties;
 import picocli.CommandLine.IVersionProvider;
 
 public class VersionProvider implements IVersionProvider {
@@ -24,17 +25,21 @@ public class VersionProvider implements IVersionProvider {
     public String[] getVersion() throws Exception {
         LeshanProperties leshanProperties = new LeshanProperties();
         leshanProperties.load();
+        AppProperties appProperties = new AppProperties();
+        appProperties.load();
 
-        return new String[] { //
-                String.format("@|bold ${COMMAND-NAME}|@ @|bold,yellow v%s|@", leshanProperties.getVersion()), //
+
+        return new String[]{ //
+                String.format("@|italic,bold App Name:|@ @|bold    %s|@ @|bold,yellow v%s|@", appProperties.getAppName(), appProperties.getVersion()), //
+                String.format("@|italic,bold Code Source: %s|@", getCodeURL()), //
+                String.format("@|italic,bold Build Date: |@ @|bold %s |@", appProperties.getTimestamp()), //
                 "", //
-                String.format("@|italic Commit ID : %s|@", leshanProperties.getCommitId()), //
-                String.format("@|italic Build Date: %s (%d)|@", leshanProperties.getBuildDateAsString(),
-                        leshanProperties.getTimestamp()), //
-                "", //
+                String.format("Leshan Client @|bold,yellow v%s|@", leshanProperties.getVersion()), //
                 "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})", //
-                "OS: ${os.name} ${os.version} ${os.arch}", //
-                "", //
-                String.format("@|italic Code Source: %s|@", leshanProperties.getCodeURL()) };
+                "OS: ${os.name} ${os.version} ${os.arch}"};
+    }
+
+    public String getCodeURL() {
+        return "https://github.com/thingsboard/thingsboard.lwm2m.demo.client";
     }
 }

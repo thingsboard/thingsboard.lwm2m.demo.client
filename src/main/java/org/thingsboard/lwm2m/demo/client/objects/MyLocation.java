@@ -74,11 +74,11 @@ public class MyLocation extends BaseInstanceEnabler {
 
     public void moveLocation(String nextMove) {
         switch (nextMove.charAt(0)) {
-        case 'w':
+        case 'd':
             moveLatitude(1.0f);
             LOG.info("Move to North {}/{}", getLatitude(), getLongitude());
             break;
-        case 'a':
+        case 'e':
             moveLongitude(-1.0f);
             LOG.info("Move to East {}/{}", getLatitude(), getLongitude());
             break;
@@ -86,7 +86,7 @@ public class MyLocation extends BaseInstanceEnabler {
             moveLatitude(-1.0f);
             LOG.info("Move to South {}/{}", getLatitude(), getLongitude());
             break;
-        case 'd':
+        case 'w':
             moveLongitude(1.0f);
             LOG.info("Move to West {}/{}", getLatitude(), getLongitude());
             break;
