@@ -55,7 +55,7 @@ java -jar thingsboard-lw-demo-client.jar -o /absolute_path/ota
 Example file settings current FW for ThingsBoard LwM2M Demo Client (format json), according to the specified location  `-o ./ota:`
 
 _Example update FW (`./ota/OtaFW.json`):_
-* Type: `fw`
+* Type: `FIRMWARE`
 * Title: `fw_test`
 * Version: `1.1`
 * Tag: `fw_test 1.1`
@@ -66,17 +66,17 @@ _Example update FW (`./ota/OtaFW.json`):_
 
 ```json5
 {
-    "type": "fw",
+    "otaType": "FIRMWARE",
     "title": "fw_test",
     "version": "1.1",
-    "file": "otaPackageFW.bin",
-    "checksumSHA256": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
-    "fileSize": 8283052    
+    "fileName": "otaPackageFW.bin",
+    "fileChecksumSHA256": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
+    "fileSize": 8283052
 }
 ```
 
 _Example update SW (`./ota/OtaSW.json`):_
-* Type: `sw`
+* Type: `SOFTWARE`
 * Title: `sw_test`
 * Version: `1.5`
 * Tag: `sw_test 1.5`
@@ -87,12 +87,12 @@ _Example update SW (`./ota/OtaSW.json`):_
 
 ```json5
 {
-    "type": "sw",
+    "otaType": "SOFTWARE",
     "title": "sw_test",
     "version": "1.5",
-    "file": "otaPackageSW.bin",
-    "checksumSHA256": "12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd",
-    "fileSize": 9283056    
+    "fileName": "otaPackageSW.bin",
+    "fileChecksumSHA256": "12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd",
+    "fileSize": 9283056
 }
 ```
 
