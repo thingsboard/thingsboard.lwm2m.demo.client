@@ -76,7 +76,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
@@ -117,7 +119,7 @@ public class ThingsboardLwDemoCient {
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
     private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
-    private static final String CF_CONFIGURATION_HEADER = "Leshan Client Demo - " + Configuration.DEFAULT_HEADER;
+    private static final String CF_CONFIGURATION_HEADER = "Thingsboard Lwm2m Demo Client - " + Configuration.DEFAULT_HEADER;
 
     public static void main(String[] args) {
 
@@ -137,13 +139,6 @@ public class ThingsboardLwDemoCient {
             LwM2mModelRepository repository = createModel(cli);
             final LeshanClient client = createClient(cli, repository);
 
-            // Print commands help
-            InteractiveCLI console = new InteractiveCLI(new InteractiveCommands(client, repository));
-            console.showHelp();
-
-            // Start the client
-            client.start();
-
             // De-register on shutdown and stop client.
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
@@ -152,8 +147,19 @@ public class ThingsboardLwDemoCient {
                 }
             });
 
-            // Start interactive console
-            console.start();
+            if (cli.helpsOptions.getVerboseLevel() > 0) {
+                // Print commands help
+                InteractiveCLI console = new InteractiveCLI(new InteractiveCommands(client, repository));
+                console.showHelp();
+
+                // Start the client
+                client.start();
+                // Start interactive console
+                console.start();
+            } else {
+                // Start the client without Interactive console
+                client.start();
+            }
 
         } catch (Exception e) {
 
@@ -172,14 +178,19 @@ public class ThingsboardLwDemoCient {
         List<ObjectModel> models = ObjectLoader.loadAllDefault();
         models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
         if (cli.main.modelsFolder != null) {
-            models.addAll(ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true));
+            List<ObjectModel> modelsCli = ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true);
+            Set<Integer> idsToRemove = new HashSet<>();
+            for (ObjectModel model : modelsCli) {
+                idsToRemove.add(model.id);
+            }
+            models.removeIf(model -> idsToRemove.contains(model.id));
+            models.addAll(modelsCli);
         }
-
         return new LwM2mModelRepository(models);
     }
 
     public static LeshanClient createClient(ClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
-        // create Leshan client from command line option
+        // create Thingsboard Lwm2m Demo Client from command line option
         final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
                 cli.location.position.longitude, cli.location.scaleFactor);
 
