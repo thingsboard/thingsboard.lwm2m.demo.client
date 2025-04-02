@@ -14,24 +14,27 @@ java -jar thingsboard-lw-demo-client.jar [options]
 
 ## General Options
 
-| Option                                     | Description                                                                                                                                                                                                                                |
-|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-h, --help`                               | Display help information.                                                                                                                                                                                                                  |
-| `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                        |
-| `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details. |
-| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                 |
-| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                         |
-| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default: `-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                        |
-| `-l, --lifetime`                           | Registration lifetime in seconds (default: `-l 300` in sec).                                                                                                                                                                               |
-| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                              |
-| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                 |
-| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. [See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                            |
-| `-o, --ota-folder`                         | Path to a folder containing OMA DDF (XML) object models. [See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                |
-| `-t, --test-objects`                       | Enables testing of custom-programmed algorithms (like OTA). Test mode is available for Object IDs 5, 9, and 19.  Syntax example: `-t`.                                                                                                     |
-| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example: `-aa attr1=value1,attr2=value2`.                                                                                                                                           |
-| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example: `-bsaa attr1=value1,attr2=value2`.                                                                                                                                                    |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example: `-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                         |
-| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example: `-jc`.                                                                                                                                                                               |
+| Option                                     | Description                                                                                                                                                                                                                                                                                     |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                                       |
+| `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                                                                             |
+| `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. <br/>More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                                 |
+| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                                      |
+| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                              |
+| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default: `-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                             |
+| `-l, --lifetime`                           | Registration lifetime in seconds (default: `-l 300` in sec).                                                                                                                                                                                                                                    |
+| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                                   |
+| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                                      |
+| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. [See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                                 |
+| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software. [See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                                                                |
+| `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA). <br/>Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                         |
+| `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files.<br/> Test mode supports Object IDs 5 and 9, utilizing Object 19. <br/>Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`. |                                                                                                  |
+| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example: `-aa attr1=value1,attr2=value2`.                                                                                                                                                                                                |
+| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example: `-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                         |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example: `-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                              |
+| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example: `-jc`.                                                                                                                                                                                                                                    |
+
+**Note:** Only one of these parameters (`-tobj` or `-tota`) can be used at a time.
 
 
 ### Use object models from a custom folder:
@@ -42,17 +45,81 @@ java -jar thingsboard-lw-demo-client.jar -m ./models
 java -jar thingsboard-lw-demo-client.jar -m /absolute_path/models
 ```
 
-### Use ota from a custom folder:
+### Using Test OTA or Test Object
+These modes are designed to test different data acquisition algorithms and process information according to real client testing rules.
+
+#### Using Test with `-tobj`
+**Large File Limitation:** The file size must not exceed **8192 bytes**.
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -o ./
-java -jar thingsboard-lw-demo-client.jar -o ./ota
-java -jar thingsboard-lw-demo-client.jar -o /absolute_path/ota
+java -jar thingsboard-lw-demo-client-{version}.jar -tobj
 ```
 
+#### Using Test with `-tota`
+**Large File Limitation:** The file size must not exceed `256 * 1024 * 1024` bytes (i.e., `268,435,456` bytes).
+
+```sh
+java -jar thingsboard-lw-demo-client-{version}.jar -tota
+```
+
+#### Using OTA from a Custom Folder
+
+Default value: `-o = ./ota`
+Default value of file name for FW: `otaPackageFW.bin`
+Default value of file name for SW: `otaPackageSW.bin`
+
+```sh
+java -jar thingsboard-lw-demo-client-{version}.jar -o ./
+java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota
+java -jar thingsboard-lw-demo-client-{version}.jar -o /absolute_path/ota
+```
+#### Using OTA Updates with ThingsBoard LwM2M Demo Client
 [OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates).
 
-Example file settings current FW for ThingsBoard LwM2M Demo Client (format json), according to the specified location  `-o ./ota:`
+- When OTA Mode is Enabled in the Device Profile -> "Use Resource ObjectId = 19 for OTA updates..."
+
+If the device profile on ThingsBoard is configured with the setting:
+
+"Use Resource ObjectId = 19 for OTA updates:
+
+    Firmware → InstanceId = 65534
+
+    Software → InstanceId = 65535
+
+The data format is JSON wrapped in Base64. The main field in JSON is:
+
+    "Checksum" (SHA256) - Used for integrity validation.
+
+    Additional fields:
+
+        "Title" - OTA name
+
+        "Version" - OTA version
+
+        "File Name" - The name used for storing the OTA on the client
+
+        "File Size" - OTA size in bytes
+
+In this mode, the file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will contain the data sent to ObjectId = 19.
+
+After receiving the OTA file, validation will be performed based on:
+
+    Checksum
+
+    File Size
+
+    The file name will be set according to the value sent in ObjectId = 19.
+
+- When OTA Mode is Disabled in the Device Profile -> "Use Resource ObjectId = 19 for OTA updates..."
+
+If the device profile on ThingsBoard is not configured with the setting:
+"Use Resource ObjectId = 19..."
+
+    No validation will be performed after receiving the OTA file.
+
+    All actual parameters in file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will be set to default values.
+
+- Example file settings current OTA for ThingsBoard LwM2M Demo Client (format json, value default), according to the specified location  `-o ./ota:`
 
 _Example update FW (`./ota/OtaFW.json`):_
 * Type: `FIRMWARE`
@@ -111,7 +178,7 @@ _Example update SW (`./ota/OtaSW.json`):_
 ```
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -o ./ota
+java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota -tota
 ```
 
 ## Location Options
@@ -213,7 +280,7 @@ this.longitude = `298.4111111`;
 
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
+java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
 ```
 
 #### DTLS Connection ID (CID) support
@@ -221,7 +288,7 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 * - 'on' to activate Connection ID support (same as `-cid 0`). `0` value means we accept to use CID but will not generated one for foreign peer.
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
 ```
 
 _What is **`-cid`**?_
@@ -243,13 +310,13 @@ _What Does **`-cid`** Affect?_
 * Security Considerations. A longer CID value increases uniqueness but adds packet overhead. Too short CID values (e.g., 1) might increase the risk of collisions.
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 4
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 4
 ```
 
 #### Register with the ThingsBoard server (mode NoSec):
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClientNoSec
+java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 #### Register with the ThingsBoard server (mode with DTLS):
@@ -269,7 +336,7 @@ java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClie
 ##### Use DTLS with PSK authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
 ```
 
 ##### Use DTLS with RPK authentication:
@@ -277,13 +344,13 @@ java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyCli
 Use CoAP over DTLS with Raw Public Key, -cpubk -cprik -spubk options should be used together. [RPK](https://github.com/eclipse/leshan/wiki/Credential-files-format)
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
 ```
 
 ##### Use DTLS with X509 authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2 
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2 
 ```
 
 ## Notes
@@ -307,7 +374,7 @@ To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo 
 #### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -u coap://demo.thingsboard.io -n MyClient -v
+java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClient -v
 ```
 
 **Note:** Depending on the number of `v` elements, the logging level for the _"org.eclipse.leshan", "org.eclipse.californium"_ classes is set:

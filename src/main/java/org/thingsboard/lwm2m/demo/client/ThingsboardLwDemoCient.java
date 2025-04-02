@@ -81,7 +81,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
+import static org.eclipse.californium.core.config.CoapConfig.*;
 import static org.eclipse.californium.scandium.config.DtlsConfig.DTLS_MAX_FRAGMENT_LENGTH;
 import static org.eclipse.californium.scandium.config.DtlsConfig.DTLS_MAX_TRANSMISSION_UNIT;
 import static org.eclipse.leshan.client.object.Security.noSec;
@@ -269,11 +269,15 @@ public class ThingsboardLwDemoCient {
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
-        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.objectForTest));
-        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.objectForTest));
+        if (cli.main.testObject && cli.main.testOta){
+            throw new IllegalStateException("Only one of these parameters (`-tobj` or `-tota`) can be used at a time.");
+        }
+        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.testObject, cli.main.testOta, cli.main.otaFolder));
+
+        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.testObject));
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0, cli.main.objectForTest),
-                new LwM2mBinaryAppDataContainer(1, cli.main.objectForTest));
+        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0, cli.main.testObject),
+                new LwM2mBinaryAppDataContainer(1, cli.main.testObject));
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
 
@@ -316,7 +320,7 @@ public class ThingsboardLwDemoCient {
             }
         };
 
-        // Create client endpoints Provider
+        // Create client protocol Provider
         List<ClientProtocolProvider> protocolProvider = new ArrayList<>();
         if (!cli.main.useJavaCoap) {
             protocolProvider.add(new CoapOscoreProtocolProvider());
@@ -327,23 +331,8 @@ public class ThingsboardLwDemoCient {
 
         // Create Californium Configuration
         Configuration clientCoapConfig = endpointsBuilder.createDefaultConfiguration();
-
         // Set some DTLS stuff
         // These configuration values are always overwritten by CLI therefore set them to transient.
-        clientCoapConfig.setTransient(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY);
-        clientCoapConfig.setTransient(DtlsConfig.DTLS_CONNECTION_ID_LENGTH);
-        clientCoapConfig.set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, !cli.dtls.supportDeprecatedCiphers);
-        clientCoapConfig.set(DtlsConfig.DTLS_CONNECTION_ID_LENGTH, cli.dtls.cid);
-        clientCoapConfig.set(CoapConfig.BLOCKWISE_STRICT_BLOCK2_OPTION, true);
-        clientCoapConfig.set(CoapConfig.BLOCKWISE_ENTITY_TOO_LARGE_AUTO_FAILOVER, true);
-        clientCoapConfig.set(CoapConfig.BLOCKWISE_STATUS_LIFETIME, DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS, TimeUnit.SECONDS);
-        clientCoapConfig.set(CoapConfig.MAX_RESOURCE_BODY_SIZE, 256 * 1024 * 1024);
-        clientCoapConfig.set(CoapConfig.RESPONSE_MATCHING, CoapConfig.MatcherMode.RELAXED);
-        clientCoapConfig.set(CoapConfig.PREFERRED_BLOCK_SIZE, 1024);
-        clientCoapConfig.set(CoapConfig.MAX_MESSAGE_SIZE, 1024);
-        clientCoapConfig.set(CoapConfig.MAX_RETRANSMIT, 4);
-
-        
 
         // Persist configuration
         File configFile = new File(CF_CONFIGURATION_FILENAME);
@@ -352,11 +341,29 @@ public class ThingsboardLwDemoCient {
         } else {
             clientCoapConfig.store(configFile, CF_CONFIGURATION_HEADER);
         }
+
+        // custom for ota
+        if (cli.main.testOta) {
+            clientCoapConfig.setTransient(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY);
+            clientCoapConfig.setTransient(DtlsConfig.DTLS_CONNECTION_ID_LENGTH);
+            clientCoapConfig.set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, !cli.dtls.supportDeprecatedCiphers);
+            clientCoapConfig.set(DtlsConfig.DTLS_CONNECTION_ID_LENGTH, cli.dtls.cid);
+            clientCoapConfig.set(BLOCKWISE_STRICT_BLOCK2_OPTION, true);
+            clientCoapConfig.set(BLOCKWISE_ENTITY_TOO_LARGE_AUTO_FAILOVER, true);
+            clientCoapConfig.set(BLOCKWISE_STATUS_LIFETIME, DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS, TimeUnit.SECONDS);
+            clientCoapConfig.set(MAX_RESOURCE_BODY_SIZE, 256 * 1024 * 1024);
+            clientCoapConfig.set(RESPONSE_MATCHING, CoapConfig.MatcherMode.RELAXED);
+            clientCoapConfig.set(PREFERRED_BLOCK_SIZE, 1024);
+            clientCoapConfig.set(MAX_MESSAGE_SIZE, 1024);
+            clientCoapConfig.set(MAX_RETRANSMIT, 4);
+        }
+
         if (cli.dtls.ciphers != null) {
             clientCoapConfig.set(DtlsConfig.DTLS_CIPHER_SUITES, cli.dtls.ciphers);
         }
 
         // Set Californium Configuration
+
         endpointsBuilder.setConfiguration(clientCoapConfig);
         endpointsBuilder.setClientAddress(cli.main.localAddress);
 
