@@ -137,6 +137,15 @@ public class ClientDemoCLI implements Runnable {
                         "-m /absolute/path/to" })
         public File modelsFolder;
 
+        @Option(names = { "-o", "--ota-folder" },
+                description = { //
+                        "Path to the folder containing OTA information for firmware or software.", //
+                        "syntax is :", //
+                        "-o ./", //
+                        "-o ./ota", //
+                        "-o /absolute/path/to" })
+        public String otaFolder;
+
         @Option(names = { "-aa", "--additional-attributes" },
                 description = { //
                         "Use additional attributes at registration time.", //
@@ -185,14 +194,24 @@ public class ClientDemoCLI implements Runnable {
                 })
         public Mode endpointNameMode = Mode.ALWAYS;
 
-        @Option(names = { "-t", "--test-objects" },
+        @Option(names = { "-tobj", "--test-objects" },
                 description = { //
                         "Enables testing of custom-programmed algorithms (like OTA). ", //
-                        "Test mode is available for Object IDs 5, 9, and 19.", //
+                        "Test mode is available for Object IDs 5, 9.", //
                         "Syntax example:", //
-                        "-t", //
+                        "-tobj", //
                 })
-        public boolean objectForTest;
+        public boolean testObject;
+
+        @Option(names = { "-tota", "--test-ota" },
+                description = { //
+                        "Allows you to test firmware/software updates using real OTA files. object 19 (instance 65456 for firmware, 65457 for software) to pass additional ota file information in json format.", //
+                        "Test mode supports object IDs 5 and 9, using object 19", //
+                        "Object 19 (instance 65534 for firmware, 65535 for software) to pass additional ota file information in json format.", //
+                        "Syntax example:", //
+                        "-tota", //
+                })
+        public boolean testOta;
     }
 
     /* ********************************** Location Section ******************************** */
