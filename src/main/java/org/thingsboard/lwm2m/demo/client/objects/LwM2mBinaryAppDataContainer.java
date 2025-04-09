@@ -15,6 +15,7 @@
  */
 package org.thingsboard.lwm2m.demo.client.objects;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -25,6 +26,9 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
+import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
+import org.thingsboard.lwm2m.demo.client.util.Utils;
 
 import javax.security.auth.Destroyable;
 import java.sql.Time;
@@ -37,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
 
 public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements Destroyable {
@@ -212,6 +218,16 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
                 }
                 value.getInstances().values().forEach(v -> {
                     this.data.put(v.getId(), (byte[]) v.getValue());
+                    if (FW_INFO_19_INSTANCE_ID.equals(this.id)){
+                        String infoNodeStr = new String((byte[]) v.getValue());
+                        JsonNode infoNode = Utils.toJsonNode(infoNodeStr);
+                        LwM2MClientOtaInfo otaInfo = treeToValue(infoNode, LwM2MClientOtaInfo.class);
+                        otaInfo.setPackageType(OtaPackageType.FIRMWARE);
+                        String fileName = otaInfo.getFileName() == null ? FW_DATA_FILE_NANE_DEF : "FW_" + otaInfo.getFileName();
+                        otaInfo.setFileName(fileName);
+                        setOtaInfoUpdateFw(otaInfo);
+                        LOG.info("{}", v.getValue());
+                    }
                 });
                 return true;
             } else {
