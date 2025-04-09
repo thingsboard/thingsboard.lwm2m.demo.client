@@ -1,17 +1,18 @@
-/*******************************************************************************
- * Copyright (c) 2022    Sierra Wireless and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
+/**
+ * Copyright © 2016-2024 The Thingsboard Authors
  *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v20.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Contributors:
- *     Sierra Wireless - initial API and implementation
- *******************************************************************************/
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.thingsboard.lwm2m.demo.client.objects;
 
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
@@ -25,8 +26,10 @@ import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+import org.eclipse.leshan.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -41,6 +44,8 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
+
 public class MyDevice extends BaseInstanceEnabler implements Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
@@ -50,8 +55,10 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
             19, 20, 21);
 
     private final Timer timer;
+    private String firmwareVersion;
 
     public MyDevice() {
+        this.initOtaFw();
         // notify new date each 5 second
         this.timer = new Timer("Device-Current Time");
         timer.schedule(new TimerTask() {
@@ -61,6 +68,13 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
                 fireResourceChange(9);
             }
         }, 5000, 5000);
+    }
+
+    private void initOtaFw(){
+        LwM2MClientOtaInfo infoFw = readOtaInfoFromFile(getPathInfoOtaFw());
+        if (infoFw != null) {
+            this.setFirmwareVersion(infoFw.getVersion());
+        }
     }
 
     @Override
@@ -153,7 +167,11 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private String getFirmwareVersion() {
-        return "1.0.0";
+        return StringUtils.isEmpty(this.firmwareVersion) ? "1.0.0" : this.firmwareVersion;
+    }
+
+    private void setFirmwareVersion(String firmwareVersion)  {
+        this.firmwareVersion = firmwareVersion;
     }
 
     private long getErrorCode() {
