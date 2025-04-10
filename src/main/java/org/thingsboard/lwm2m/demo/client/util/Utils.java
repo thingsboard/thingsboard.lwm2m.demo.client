@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.stream.Stream;
@@ -90,8 +91,10 @@ public class Utils {
 
     public static void writeOtaInfoToFile(String filePath, LwM2MClientOtaInfo info){
         try {
+            Path dirPath = Paths.get(filePath).getParent();
+            Files.createDirectories(dirPath);
             OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), info);
-            LOG.info("New otsInfo successfully saved to: \"{}\".", filePath);
+            LOG.info("New otsInfo successfully saved to: \"{}\" [{}].", filePath, info);
         } catch (IOException e) {
             throw new IllegalArgumentException("Can't write to file: \"" + filePath + "\" value: [" + info.toString() + "]", e);
         }

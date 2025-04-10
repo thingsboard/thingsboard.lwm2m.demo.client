@@ -66,6 +66,8 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 9);
     private static final String PACKAGE_NANE_DEF = "firmware";
     private static final String PACKAGE_VERSION_DEF = "1.0.0";
+    private static final String PREF_TMP = "_tmp";
+    private static final String PREF_FW = "FW";
 
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
             new DaemonThreadFactory(getClass().getSimpleName() + "-test-scope-delete-ota"));
@@ -170,7 +172,8 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         switch (resourceId) {
             case 0:
                 if (this.testObject) {
-                    this.downloadingToDownloadedSuccessTest();
+                    this.downloadingToDownloadedSuccessTest(resourceId);
+                    this.saveOtaInfoUpdateFwWithoutObject19((byte[]) value.getValue());
                 } else if (this.testOta) {
                     String resultSavePayload = startDownloading((byte[]) value.getValue());
                     if (!StringUtils.isEmpty(resultSavePayload)) {
@@ -181,7 +184,8 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             case 1:
                 this.setPackageURI((String) value.getValue());
                 if (this.testObject) {
-                    this.downloadingToDownloadedSuccessTest();
+                    this.downloadingToDownloadedSuccessTest(resourceId);
+                    this.saveOtaInfoUpdateFwWithoutObject19(null);
                 } else if (this.testOta) {
                     this.startDownloadingUri();
                 }
@@ -197,6 +201,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private void setPackageURI(String packageURI) {
         if (!packageURI.equals(this.packageURI)) {
+            LOG.info("Write on Device packageURI: [{}]", packageURI);
             fireResourceChange(1);
         }
         this.packageURI = packageURI;
@@ -254,7 +259,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         timer.cancel();
     }
 
-    private void downloadingToDownloadedSuccessTest() {
+    private void downloadingToDownloadedSuccessTest(int resourceId) {
         scheduler.schedule(() -> {
             try {
                 this.setState(FirmwareUpdateState.DOWNLOADING.getCode());
@@ -263,6 +268,8 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             } catch (Exception e) {
             }
         }, 100, TimeUnit.MILLISECONDS);
+        String msgResource = resourceId == 0 ? "Via resource 0." : "Via Resource 1 (PackageURI = " + this.getPackageURI() + ").";
+        LOG.info("Finish Write data FW. {}", msgResource);
     }
 
     private void updatingSuccessTest() {
@@ -347,8 +354,8 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         String result = "";
         if (data != null && data.length > 0) {
             LwM2MClientOtaInfo infoFw = getOtaInfoUpdateFw();
-            String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
             if (infoFw != null ) {
+                String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
                 if (!fileChecksumSHA256.equals(infoFw.getFileChecksumSHA256())) {
                     result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoFw.getFileChecksumSHA256();
                     LOG.error(result);
@@ -364,25 +371,18 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                     return result;
                 }
             } else {
-                infoFw = new LwM2MClientOtaInfo();
-                infoFw.setPackageType(OtaPackageType.FIRMWARE);
-                infoFw.setFileName(FW_DATA_FILE_NANE_DEF);
-                infoFw.setFileChecksumSHA256(fileChecksumSHA256);
-                infoFw.setFileSize(data.length);
-                setOtaInfoUpdateFw(infoFw);
-                LOG.info("Create new FW info with default params.");
+                this.saveOtaInfoUpdateFwWithoutObject19(data);
             }
             String filePath = getPathDataOtaFW(infoFw);
             Path dirPath = Paths.get(filePath).getParent();
             try {
                 Files.createDirectories(dirPath);
-                String prefTmp = "_tmp";
-                renameOtaFilesToTmp(dirPath, "FW", prefTmp);
+                renameOtaFilesToTmp(dirPath, PREF_FW, PREF_TMP);
                 try (FileOutputStream fos = new FileOutputStream(filePath)) {
                     fos.write(data);
                     LOG.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
                     this.setState(FirmwareUpdateState.DOWNLOADED.getCode());
-                    deleteOtaFiles(dirPath, prefTmp);
+                    deleteOtaFiles(dirPath, PREF_TMP);
                     return result;
                 }
 
@@ -403,5 +403,27 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private String getPathDataOtaFW(LwM2MClientOtaInfo infoFW) {
         String fileName = infoFW == null || StringUtils.isEmpty(infoFW.getFileName()) ? FW_DATA_FILE_NANE_DEF : infoFW.getFileName();
         return getOtaFolder() + "/" + fileName;
+    }
+
+    private void saveOtaInfoUpdateFwWithoutObject19(byte[] data) {
+        if (data != null && data.length > 0) {
+            LwM2MClientOtaInfo infoFw = getOtaInfoUpdateFw();
+            if (infoFw == null ) {
+                String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
+                infoFw = new LwM2MClientOtaInfo();
+                infoFw.setPackageType(OtaPackageType.FIRMWARE);
+                infoFw.setFileName(FW_DATA_FILE_NANE_DEF);
+                infoFw.setFileChecksumSHA256(fileChecksumSHA256);
+                infoFw.setFileSize(data.length);
+                setOtaInfoUpdateFw(infoFw);
+                LOG.info("Create new FW info with default params.");
+            }
+        } else {
+            setOtaInfoUpdateFw(null);
+            LOG.info("New FW info is not Created with default params (PackageURI + testObject). data = null");
+            String path = getOtaFolder();
+            deleteOtaFiles(Paths.get(path), PREF_FW);
+            LOG.info("Delete all FW files from path: [{}/{}...]", path, PREF_FW);
+        }
     }
 }

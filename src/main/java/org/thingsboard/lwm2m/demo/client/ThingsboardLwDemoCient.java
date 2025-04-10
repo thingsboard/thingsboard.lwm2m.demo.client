@@ -346,7 +346,7 @@ public class ThingsboardLwDemoCient {
         }
 
         // custom for ota
-        if (cli.main.testOta) {
+        if (cli.main.testOta || cli.main.testObject) {
             clientCoapConfig.setTransient(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY);
             clientCoapConfig.setTransient(DtlsConfig.DTLS_CONNECTION_ID_LENGTH);
             clientCoapConfig.set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, !cli.dtls.supportDeprecatedCiphers);
