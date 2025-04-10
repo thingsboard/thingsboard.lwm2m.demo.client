@@ -226,7 +226,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
                         String fileName = otaInfo.getFileName() == null ? FW_DATA_FILE_NANE_DEF : "FW_" + otaInfo.getFileName();
                         otaInfo.setFileName(fileName);
                         setOtaInfoUpdateFw(otaInfo);
-                        LOG.info("{}", v.getValue());
+                        LOG.info("otainfo: [{}], value: {}", getOtaInfoUpdateFw(), v.getValue());
                     }
                 });
                 return true;

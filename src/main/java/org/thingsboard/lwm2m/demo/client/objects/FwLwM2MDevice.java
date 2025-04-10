@@ -148,21 +148,11 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         switch (resourceId) {
             case 2:
                 if (this.getState() == FirmwareUpdateState.DOWNLOADED.getCode() && this.getUpdateResult() == FirmwareUpdateResult.INITIAL.getCode()) {
-                    if (this.testObject) {
-                        this.updatingSuccessTest();
-                        return ExecuteResponse.success();
-                    } else if (this.testOta) {
-                            this.startUpdating();
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-                        }
-                        this.setState(FirmwareUpdateState.IDLE.getCode());
-                        this.setUpdateResult(FirmwareUpdateResult.INITIAL.getCode());
-
-                        return ExecuteResponse.success();
+                    if (this.testObject || this.testOta) {
+                        startUpdating();
                     }
+                    this.updatingSuccessTest();
+                    return ExecuteResponse.success();
                 } else {
                     String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]", FirmwareUpdateState.fromCode(this.getState()).getDescription(), FirmwareUpdateResult.fromCode(this.getUpdateResult()).getDescription());
                     LOG.error(errorMsg);
@@ -281,6 +271,9 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 this.setState(FirmwareUpdateState.UPDATING.getCode());
                 Thread.sleep(100);
                 this.setUpdateResult(FirmwareUpdateResult.SUCCESS.getCode());
+                Thread.sleep(100);
+                this.setState(FirmwareUpdateState.IDLE.getCode());
+                this.setUpdateResult(FirmwareUpdateResult.INITIAL.getCode());
             } catch (Exception e) {
             }
         }, 100, TimeUnit.MILLISECONDS);
@@ -347,8 +340,6 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             this.setPackageVersion(infoFw.getVersion());
             setOtaInfoUpdateFw(null);
         }
-        this.setState(FirmwareUpdateState.UPDATING.getCode());
-        this.setUpdateResult(FirmwareUpdateResult.SUCCESS.getCode());
     }
 
     private String startDownloading(byte[] data) {
