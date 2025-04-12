@@ -152,7 +152,6 @@ _Example update SW (`./ota/OtaSW.json`):_
 * type: `SOFTWARE`
 * title: `sw_test`
 * version: `1.5`
-* Tag: `sw_test 1.5`
 * filePath: `./ota`
 * fileName: `otaPackageSW.bin`
 * checksum: `12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd`,
