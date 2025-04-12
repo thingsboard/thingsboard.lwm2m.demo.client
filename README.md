@@ -92,21 +92,21 @@ The data format is JSON wrapped in Base64. The main field in JSON is:
 
     Additional fields:
 
-        "Title" - OTA name
+        "title" - OTA name
 
-        "Version" - OTA version
+        "version" - OTA version
 
-        "File Name" - The name used for storing the OTA on the client
+        "fileName" - The name used for storing the OTA on the client
 
-        "File Size" - OTA size in bytes
+        "dataSize" - OTA size in bytes
 
 In this mode, the file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will contain the data sent to ObjectId = 19.
 
 After receiving the OTA file, validation will be performed based on:
 
-    Checksum
+    checksum  (SHA256)
 
-    File Size
+    dataSize
 
     The file name will be set according to the value sent in ObjectId = 19.
 
@@ -122,20 +122,19 @@ If the device profile on ThingsBoard is not configured with the setting:
 - Example file settings current OTA for ThingsBoard LwM2M Demo Client (format json, value default), according to the specified location  `-o ./ota:`
 
 _Example update FW (`./ota/OtaFW.json`):_
-* Type: `FIRMWARE`
-* Title: `fw_test`
-* Version: `1.1`
-* Tag: `fw_test 1.1`
-* FilePath: `./ota`
-* File: `otaPackageFW.bin`
-* Checksum (SHA256): `07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800`,
-* File Size: `8283052` in bytes
+* type: `FIRMWARE`
+* title: `fw_test`
+* version: `1.1`
+* filePath: `./ota`
+* fileName: `otaPackageFW.bin`
+* checksum: `07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800`,
+* dataSize: `8283052` in bytes
 
 ```json5
 {
     "_comment": "This JSON file contains firmware metadata.",
     "_commentPackageType": "Always \"fw\" for firmware.",
-    "packageType": "fw",
+    "type": "fw",
     "_commentTitle": "The name of the firmware, corresponding to the file fileName.",
     "title": "fw_test",
     "_commentVersione": "The version of the firmware, corresponding to the file fileName.",
@@ -143,27 +142,27 @@ _Example update FW (`./ota/OtaFW.json`):_
     "_commentFileName": "The name of the firmware file, located in the same directory as this JSON file.",
     "fileName": "otaPackageFW.bin",
     "_commentFileChecksumSHA256": "SHA-256 checksum of the file fileName.",
-    "fileChecksumSHA256": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
+    "checksum": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
     "_commentFileSize": "Size of the file fileName in bytes.",
-    "fileSize": 8283052
+    "dataSize": 8283052
 }
 ```
 
 _Example update SW (`./ota/OtaSW.json`):_
-* Type: `SOFTWARE`
-* Title: `sw_test`
-* Version: `1.5`
+* type: `SOFTWARE`
+* title: `sw_test`
+* version: `1.5`
 * Tag: `sw_test 1.5`
-* FilePath: `./ota`
-* File: `otaPackageSW.bin`
-* Checksum (SHA256): `12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd`,
-* File Size: `9283056` in bytes
+* filePath: `./ota`
+* fileName: `otaPackageSW.bin`
+* checksum: `12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd`,
+* dataSize: `9283056` in bytes
 
 ```json5
 {
     "_comment": "This JSON file contains softmware metadata.",
     "_commentPackageType": "Always \"sw\" for softmware.",
-    "packageType": "sw",
+    "type": "sw",
     "_commentTitle": "The name of the softmware, corresponding to the file fileName.",
     "title": "sw_test",
     "_commentVersione": "The version of the softmware, corresponding to the file fileName.",
@@ -171,9 +170,9 @@ _Example update SW (`./ota/OtaSW.json`):_
     "_commentFileName": "The name of the softmware file, located in the same directory as this JSON file.",
     "fileName": "otaPackageSW.bin",
     "_commentFileChecksumSHA256": "SHA-256 checksum of the file fileName.",
-    "fileChecksumSHA256": "12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd",
+    "checksum": "12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd",
     "_commentFileSize": "Size of the file fileName in bytes.",
-    "fileSize": 9283056
+    "dataSize": 9283056
 }
 ```
 
