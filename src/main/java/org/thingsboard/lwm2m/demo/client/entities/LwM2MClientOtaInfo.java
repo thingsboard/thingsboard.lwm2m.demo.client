@@ -24,8 +24,8 @@ import lombok.Data;
 public class LwM2MClientOtaInfo {
     private String title;
     private String version;
-    private String fileChecksumSHA256;
-    private Integer fileSize;
+    private String checksum;
+    private Integer dataSize;
     private String fileName;
-    private OtaPackageType packageType;
+    private OtaPackageType type;
 }

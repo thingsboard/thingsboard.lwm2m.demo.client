@@ -356,15 +356,15 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             LwM2MClientOtaInfo infoFw = getOtaInfoUpdateFw();
             if (infoFw != null ) {
                 String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
-                if (!fileChecksumSHA256.equals(infoFw.getFileChecksumSHA256())) {
-                    result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoFw.getFileChecksumSHA256();
+                if (!fileChecksumSHA256.equals(infoFw.getChecksum())) {
+                    result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoFw.getChecksum();
                     LOG.error(result);
                     // 5: Integrity check failure for new downloaded package.
                     this.updateResFailed(FirmwareUpdateResult.INTEGRITY_CHECK_FAILURE.getCode());
                     return result;
                 }
-                if (data.length != infoFw.getFileSize()) {
-                    result = "File writing error: failed FileSize.. Payload: " + data.length + " Original: " + infoFw.getFileSize();
+                if (data.length != infoFw.getDataSize()) {
+                    result = "File writing error: failed FileSize.. Payload: " + data.length + " Original: " + infoFw.getDataSize();
                     LOG.error(result);
                     // 5: Integrity check failure for new downloaded package.
                     this.updateResFailed(FirmwareUpdateResult.INTEGRITY_CHECK_FAILURE.getCode());
@@ -411,10 +411,10 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             if (infoFw == null ) {
                 String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
                 infoFw = new LwM2MClientOtaInfo();
-                infoFw.setPackageType(OtaPackageType.FIRMWARE);
+                infoFw.setType(OtaPackageType.FIRMWARE);
                 infoFw.setFileName(FW_DATA_FILE_NANE_DEF);
-                infoFw.setFileChecksumSHA256(fileChecksumSHA256);
-                infoFw.setFileSize(data.length);
+                infoFw.setChecksum(fileChecksumSHA256);
+                infoFw.setDataSize(data.length);
                 setOtaInfoUpdateFw(infoFw);
                 LOG.info("Create new FW info with default params.");
             }

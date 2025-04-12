@@ -222,7 +222,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
                         String infoNodeStr = new String((byte[]) v.getValue());
                         JsonNode infoNode = Utils.toJsonNode(infoNodeStr);
                         LwM2MClientOtaInfo otaInfo = treeToValue(infoNode, LwM2MClientOtaInfo.class);
-                        otaInfo.setPackageType(OtaPackageType.FIRMWARE);
+                        otaInfo.setType(OtaPackageType.FIRMWARE);
                         String fileName = otaInfo.getFileName() == null ? FW_DATA_FILE_NANE_DEF : "FW_" + otaInfo.getFileName();
                         otaInfo.setFileName(fileName);
                         setOtaInfoUpdateFw(otaInfo);
