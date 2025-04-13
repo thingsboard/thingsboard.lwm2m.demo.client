@@ -42,8 +42,8 @@ public class Utils {
     public static final String FW_INFO_FILE_NANE_DEF = "FW_Ota.json";
     public static final String SW_DATA_FILE_NANE_DEF = "SW_OtaPackage.bin";
     public static final String SW_INFO_FILE_NANE_DEF = "SW_Ota.json";
-    public static final Integer FW_INFO_19_INSTANCE_ID = 65534;
-    public static final Integer SW_INFO_19_INSTANCE_ID = 65535;
+    public static final Integer FW_INFO_19_INSTANCE_ID = 65533;
+    public static final Integer SW_INFO_19_INSTANCE_ID = 65534;
     private static String otaFolder;
     private static LwM2MClientOtaInfo otaInfoUpdateFw;
 

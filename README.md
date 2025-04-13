@@ -36,7 +36,6 @@ java -jar thingsboard-lw-demo-client.jar [options]
 
 **Note:** Only one of these parameters (`-tobj` or `-tota`) can be used at a time.
 
-
 ### Use object models from a custom folder:
 
 ```sh
@@ -46,9 +45,11 @@ java -jar thingsboard-lw-demo-client.jar -m /absolute_path/models
 ```
 
 ### Using Test OTA or Test Object
+
 These modes are designed to test different data acquisition algorithms and process information according to real client testing rules.
 
 #### Using Test with `-tobj`
+
 **Large File Limitation:** The file size must not exceed **8192 bytes**.
 
 ```sh
@@ -56,6 +57,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -tobj
 ```
 
 #### Using Test with `-tota`
+
 **Large File Limitation:** The file size must not exceed `256 * 1024 * 1024` bytes (i.e., `268,435,456` bytes).
 
 ```sh
@@ -73,7 +75,9 @@ java -jar thingsboard-lw-demo-client-{version}.jar -o ./
 java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota
 java -jar thingsboard-lw-demo-client-{version}.jar -o /absolute_path/ota
 ```
+
 #### Using OTA Updates with ThingsBoard LwM2M Demo Client
+
 [OTA  firmware and software update](https://thingsboard.io/docs/user-guide/ota-updates).
 
 - When OTA Mode is Enabled in the Device Profile -> "Use Resource ObjectId = 19 for OTA updates..."
@@ -82,46 +86,55 @@ If the device profile on ThingsBoard is configured with the setting:
 
 "Use Resource ObjectId = 19 for OTA updates:
 
-    Firmware → InstanceId = 65534
+```
+Firmware → InstanceId = 65533
 
-    Software → InstanceId = 65535
+Software → InstanceId = 65534
+```
 
 The data format is JSON wrapped in Base64. The main field in JSON is:
 
-    "Checksum" (SHA256) - Used for integrity validation.
+```
+"Checksum" (SHA256) - Used for integrity validation.
 
-    Additional fields:
+Additional fields:
 
-        "title" - OTA name
+    "title" - OTA name
 
-        "version" - OTA version
+    "version" - OTA version
 
-        "fileName" - The name used for storing the OTA on the client
+    "fileName" - The name used for storing the OTA on the client
 
-        "dataSize" - OTA size in bytes
+    "dataSize" - OTA size in bytes
+```
 
 In this mode, the file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will contain the data sent to ObjectId = 19.
 
 After receiving the OTA file, validation will be performed based on:
 
-    checksum  (SHA256)
+```
+checksum  (SHA256)
 
-    dataSize
+dataSize
 
-    The file name will be set according to the value sent in ObjectId = 19.
+The file name will be set according to the value sent in ObjectId = 19.
+```
 
 - When OTA Mode is Disabled in the Device Profile -> "Use Resource ObjectId = 19 for OTA updates..."
 
 If the device profile on ThingsBoard is not configured with the setting:
 "Use Resource ObjectId = 19..."
 
-    No validation will be performed after receiving the OTA file.
+```
+No validation will be performed after receiving the OTA file.
 
-    All actual parameters in file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will be set to default values.
+All actual parameters in file settings for current FW in ThingsBoard LwM2M Demo Client (in JSON format) will be set to default values.
+```
 
 - Example file settings current OTA for ThingsBoard LwM2M Demo Client (format json, value default), according to the specified location  `-o ./ota:`
 
 _Example update FW (`./ota/OtaFW.json`):_
+
 * type: `FIRMWARE`
 * title: `fw_test`
 * version: `1.1`
@@ -149,6 +162,7 @@ _Example update FW (`./ota/OtaFW.json`):_
 ```
 
 _Example update SW (`./ota/OtaSW.json`):_
+
 * type: `SOFTWARE`
 * title: `sw_test`
 * version: `1.5`
@@ -175,6 +189,7 @@ _Example update SW (`./ota/OtaSW.json`):_
 }
 ```
 
+
 ```sh
 java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota -tota
 ```
@@ -191,10 +206,13 @@ java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota -tota
 In the **ThingsBoard LwM2M Demo Client**, _atitude_ and _longitude_ values are adjusted to ensure they remain in the positive range. This logic converts the traditional latitude/longitude format (which includes negative values) into a fully positive coordinate system.
 
 #### Explanation of each case:
+
 When the application is started, it is created in LeshanClient:
 
 *I.* If `-pos lat:long`, i.e. _latitude_ and _longitude_ are not null
+
 1. _latitude_ + `90f`
+
 * Latitude values typically range from -90 to +90 degrees.
 * Adding 90f shifts this range to [0, 180], possibly to avoid negative values and simplify storage.
 
@@ -207,6 +225,7 @@ this.scaleFactor = `1.0`;
 ```
 
 2. _longitude_ + `180f`
+
 * Longitude values usually range from -180 to +180 degrees.
 * Adding 180f shifts this range to [0, 360], ensuring only positive values are stored.
 
@@ -219,9 +238,12 @@ this.scaleFactor = `1.0`;
 ```
 
 *II.* if `-pos lat:long` is absent, i.e. _latitude_ and _longitude_ are  *`null`*
+
 1. RANDOM.nextInt(180) for latitude
+
 * a random value between 0 and 179 is assigned, keeping it within the adjusted [0, 180] range.
-* 
+*
+
 ```markdown
 `-sf 3.0`
 this.scaleFactor = `scaleFactor`;
@@ -231,6 +253,7 @@ this.latitude = `20.0`;
 ```
 
 2. RANDOM.nextInt(360) for longitude
+
 * a random value between 0 and 359 is generated, matching the adjusted [0, 360] range.
 
 ```markdown
@@ -271,11 +294,11 @@ this.longitude = `298.4111111`;
 | `-f, --force-full-handshake`        | By default client will try to resume DTLS session by using abbreviated Handshake. This option force to always do a full handshake. Syntax example: `f`.                                                                                                                                                          |
 | `-cid, --connection-id`             | Enable DTLS connection ID (default: off). Control usage of DTLS connection ID: - 'on' to activate Connection ID support (same as -cid 0); - 'off' to deactivate it; - Positive value define the size in byte of CID generated;  0 value means we accept to use CID but will not generated one for foreign peer." |
 | `-c, --cipher-suites`               | List of cipher suites to use (comma-separated). Define cipher suites to use. CipherCuite enum value separated by ',' without spaces. E.g: TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM.                                                                                                                   |
-| `-oc, --support-deprecated-ciphers` | Enable support for deprecated cipher suites. Syntax example: `-oc`.                                                                                                                                                                                                                                              |
+| `-oc, --support-deprecated-ciphers` | Enable support for deprecated cipher suites. Syntax example:`-oc`.                                                                                                                                                                                                                                             |
 
 ### Example Commands
-#### Cipher suites to use
 
+#### Cipher suites to use
 
 ```sh
 java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
@@ -452,7 +475,6 @@ Explanation:
 | `5700`  | Resource ID (Sensor Value).           |
 | `25.3`  | New value for the resource.           |
 
-
 ```sh
 send `/3303/0/5700=25.3`
 ```
@@ -463,7 +485,6 @@ This updates multiple resources at once:
 |----------------------|--------------------------------------------------------|
 | `/3323/1/5601=10.5`  | Updates Min Value for Object 3323 (Power Measurement). |
 | `/3323/1/5602=50.8`  | Updates Max Value.                                     |
-
 
 ```sh
 send /3323/1/5601=10.5 /3323/1/5602=50.8
@@ -486,7 +507,6 @@ Explanation:
 | `5700`  | Resource ID (Sensor Value).           |
 | `22.5`  | New value for the resource.           |
 
-
 ```sh
 collect /3303/0/5700=22.5
 send
@@ -497,7 +517,9 @@ collect /3323/1/5601=15.7
 collect /3323/1/5602=48.2
 send
 ```
+
 **This sequence:**
+
 * _Collects_ `15.7` as the Min Value for Power Measurement.
 * _Collects_ `48.2` as the Max Value for Power Measurement.
 * _Sends_ `all` collected `values at once`.
