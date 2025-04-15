@@ -24,6 +24,7 @@ import org.eclipse.leshan.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
+import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,10 +43,14 @@ public class Utils {
     public static final String FW_INFO_FILE_NANE_DEF = "FW_Ota.json";
     public static final String SW_DATA_FILE_NANE_DEF = "SW_OtaPackage.bin";
     public static final String SW_INFO_FILE_NANE_DEF = "SW_Ota.json";
+    public static final String PREF_TMP = "_tmp";
+    public static final String PREF_FW = "FW_";
+    public static final String PREF_SW = "SW_";
     public static final Integer FW_INFO_19_INSTANCE_ID = 65533;
     public static final Integer SW_INFO_19_INSTANCE_ID = 65534;
     private static String otaFolder;
     private static LwM2MClientOtaInfo otaInfoUpdateFw;
+    private static LwM2MClientOtaInfo otaInfoUpdateSw;
 
     public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
@@ -124,8 +129,26 @@ public class Utils {
         return Utils.otaInfoUpdateFw;
     }
 
+    public static void setOtaInfoUpdate(LwM2MClientOtaInfo otaInfoUpdate) {
+        if (otaInfoUpdate.getType().equals(OtaPackageType.FIRMWARE)) {
+            setOtaInfoUpdateFw(otaInfoUpdate);
+        } else {
+            setOtaInfoUpdateSw(otaInfoUpdate);
+        }
+    }
+    public static void setOtaInfoUpdateSw(LwM2MClientOtaInfo otaInfoUpdateSW) {
+        Utils.otaInfoUpdateSw = otaInfoUpdateSW;
+    }
+
+    public static LwM2MClientOtaInfo getOtaInfoUpdateSw(){
+        return Utils.otaInfoUpdateSw;
+    }
+
     public static String getPathInfoOtaFw() {
         return getOtaFolder() + "/" + FW_INFO_FILE_NANE_DEF;
+    }
+    public static String getPathInfoOtaSw() {
+        return getOtaFolder() + "/" + SW_INFO_FILE_NANE_DEF;
     }
 
     public static void renameOtaFilesToTmp(Path directory, String mask, String prefix) {

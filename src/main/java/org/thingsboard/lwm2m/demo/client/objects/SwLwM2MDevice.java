@@ -15,19 +15,39 @@
  */
 package org.thingsboard.lwm2m.demo.client.objects;
 
+import com.google.common.hash.Hashing;
+import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.config.CoapConfig;
+import org.eclipse.californium.core.network.CoapEndpoint;
+import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.util.DaemonThreadFactory;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.request.argument.Argument;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+import org.eclipse.leshan.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
+import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
+import org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateResult;
+import org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateState;
 
 import javax.security.auth.Destroyable;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -37,10 +57,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
+import static org.thingsboard.lwm2m.demo.client.util.FirmwareUpdateState.DOWNLOADED;
+import static org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateResult.*;
+import static org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateState.*;
+import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
+
 public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 4, 6, 7, 9);
+    private static final String PACKAGE_NANE_DEF = "software";
+    private static final String PACKAGE_VERSION_DEF = "1.0.0";
 
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
             new DaemonThreadFactory(getClass().getSimpleName() + "-test-scope"));
@@ -48,29 +76,45 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private final AtomicInteger updateResult = new AtomicInteger(0);
 
-    private boolean objectForTest;
     private final Timer timer;
+    private boolean testObject;
+    private boolean testOta;
+    private String packageURI;
+    private String packageName = PACKAGE_NANE_DEF;
+    private String packageVersion = PACKAGE_VERSION_DEF;
 
     public SwLwM2MDevice() {
+        this.initOtaSw();
         this.timer = new Timer("9 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                fireResourceChange(7);
+//                fireResourceChange(7);
             }
         }, 5000, 5000);
     }
 
-    public SwLwM2MDevice(boolean objectForTest) {
-        this.objectForTest = objectForTest;
+    public SwLwM2MDevice(boolean testObject, boolean testOta) {
+        this.testObject = testObject;
+        this.testOta = testOta;
+        this.initOtaSw();
         // notify new date each 5 second
         this.timer = new Timer("9 - Device-Current Time");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                fireResourceChange(7);
+//                fireResourceChange(7);
             }
         }, 5000, 5000);
+    }
+
+
+    private void initOtaSw(){
+        LwM2MClientOtaInfo infoSw = readOtaInfoFromFile(getPathInfoOtaSw());
+        if (infoSw != null) {
+            this.setPkgName(infoSw.getTitle());
+            this.setPackageVersion(infoSw.getVersion());
+        }
     }
 
     @Override
@@ -83,7 +127,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             case 1:
                 return ReadResponse.success(resourceId, getPkgVersion());
             case 7:
-                return ReadResponse.success(resourceId, getUpdateState());
+                return ReadResponse.success(resourceId, getState());
             case 9:
                 return ReadResponse.success(resourceId, getUpdateResult());
             default:
@@ -99,12 +143,32 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
 
         switch (resourceId) {
-            case 4:
-                if (this.objectForTest) {
-                    startUpdating();
+            case 4: // This Resource is only executable when the value of the State Resource is DELIVERED
+                if (this.getState() == SoftwareUpdateState.DELIVERED.getCode() && this.getUpdateResult() == SoftwareUpdateResult.SUCCESSFULLY_DOWNLOADED_VERIFIED.getCode()) {
+                    if (this.testObject || this.testOta) {
+                        this.startUpdatingSw();
+                    }
+                    this.updatingSuccessTest();
+                    return ExecuteResponse.success();
+                } else {
+                    String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]",
+                            SoftwareUpdateState.fromUpdateStateSwByCode(this.getState()).getType(), SoftwareUpdateResult.fromUpdateResultSwByCode(this.getUpdateResult()).getType());
+                    LOG.error(errorMsg);
+                    return ExecuteResponse.badRequest(errorMsg);
                 }
-                return ExecuteResponse.success();
             case 6:
+                if (!arguments.isEmpty()) {
+                    int arg = ((Argument)arguments.getValues().toArray()[0]).getDigit();
+                    if (arg == 0){
+                        deleteSwFile();
+                    } else if (arg == 1) {
+                        // If the argument is 1 ("ForUpdate"), the Client MUST prepare itself for receiving a Package used to upgrade the Software already in place. Update State is set back to INITIAL state.
+                        this.setState(SoftwareUpdateState.INITIAL.getCode());
+                        this.setUpdateResult(SoftwareUpdateResult.INITIAL.getCode());
+                    }
+                } else {
+                    deleteSwFile();
+                }
                 return ExecuteResponse.success();
             default:
                 return super.execute(identity, resourceId, arguments);
@@ -117,9 +181,23 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
         switch (resourceId) {
             case 2:
+                if (this.testObject) {
+                    this.downloadingToDownloadedSuccessTest(resourceId);
+                    this.saveOtaInfoUpdateSwWithObject19((byte[]) value.getValue());
+                } else if (this.testOta) {
+                    String resultSavePayload = startDownloadingSw((byte[]) value.getValue());
+                    if (!StringUtils.isEmpty(resultSavePayload)) {
+                        return WriteResponse.badRequest(resultSavePayload);
+                    }
+                }
+                return WriteResponse.success();
             case 3:
-                if(this.objectForTest) {
-                    startDownloading();
+                this.setPackageURI((String) value.getValue());
+                if (this.testObject) {
+                    this.downloadingToDownloadedSuccessTest(resourceId);
+                    this.saveOtaInfoUpdateSwWithObject19(null);
+                } else if (this.testOta) {
+                    this.startDownloadingSwUri();
                 }
                 return WriteResponse.success();
             default:
@@ -127,20 +205,58 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         }
     }
 
-    private int getUpdateState() {
+    private int getState() {
         return state.get();
+    }
+
+    private void setState(int state) {
+        if (state != this.state.get()){
+            this.state.set(state);
+            LOG.info("Update state on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 7, this.state.get(), SoftwareUpdateState.fromUpdateStateSwByCode(this.state.get()).getType());
+            fireResourceChange(7);
+        }
+
     }
 
     private int getUpdateResult() {
         return updateResult.get();
     }
 
-    private String getPkgName() {
-        return "software";
+    private void setUpdateResult(int updateResult) {
+        if (updateResult != this.updateResult.get()) {
+            this.updateResult.set(updateResult);
+            LOG.info("Update result on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 9, this.updateResult.get(), SoftwareUpdateResult.fromUpdateResultSwByCode(this.updateResult.get()).getType());
+            fireResourceChange(9);
+        }
     }
 
+    private String getPkgName() {
+        return this.packageName;
+    }
+
+    private void setPkgName(String packageName) {
+        this.packageName = packageName == null ? PACKAGE_NANE_DEF : packageName;
+    }
+
+
     private String getPkgVersion() {
-        return "1.0.0";
+        return this.packageVersion;
+    }
+
+    private void setPackageVersion(String packageVersion){
+        this.packageVersion = packageVersion == null ? PACKAGE_VERSION_DEF : packageVersion;
+    }
+
+    private String getPackageURI() {
+        return packageURI == null ? "" : packageURI;
+    }
+
+    private void setPackageURI(String packageURI) {
+        if (!packageURI.equals(this.packageURI)) {
+            LOG.info("Write on Device packageURI: [{}]", packageURI);
+            fireResourceChange(1);
+        }
+        this.packageURI = packageURI;
     }
 
     @Override
@@ -153,35 +269,197 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         scheduler.shutdownNow();
     }
 
-    private void startDownloading() {
+    private void downloadingToDownloadedSuccessTest(int resourceId) {
         scheduler.schedule(() -> {
             try {
-                state.set(1);
-                updateResult.set(1);
-                fireResourceChange(7);
-                fireResourceChange(9);
+                this.setState(DOWNLOAD_STARTED.getCode());
+                this.setUpdateResult(DOWNLOADING.getCode());
                 Thread.sleep(100);
-                state.set(2);
-                fireResourceChange(7);
+
+                this.setState(DOWNLOADED.getCode());
                 Thread.sleep(100);
-                state.set(3);
-                fireResourceChange(7);
-                Thread.sleep(100);
-                updateResult.set(3);
-                fireResourceChange(9);
+
+                this.setState(DELIVERED.getCode());
+                this.setUpdateResult(SUCCESSFULLY_DOWNLOADED_VERIFIED.getCode());
             } catch (Exception e) {
 
             }
         }, 100, TimeUnit.MILLISECONDS);
+        String msgResource = resourceId == 2 ? "Via resource 2." : "Via Resource 3 (PackageURI = " + this.getPackageURI() + ").";
+        LOG.info("Finish Write data SW. {}", msgResource);
     }
 
-    private void startUpdating() {
+    private void startUpdatingSw() {
+        LwM2MClientOtaInfo infoSw = getOtaInfoUpdateSw();
+        if (infoSw != null ) {
+            writeOtaInfoToFile(getPathInfoOtaSw(), infoSw);
+            this.setPkgName(infoSw.getTitle());
+            this.setPackageVersion(infoSw.getVersion());
+            setOtaInfoUpdateSw(null);
+        }
+    }
+
+    private String startDownloadingSw(byte[] data) {
+        this.setState(SoftwareUpdateState.DOWNLOAD_STARTED.getCode());
+        this.setUpdateResult(SoftwareUpdateResult.DOWNLOADING.getCode());
+        String result = "";
+        if (data != null && data.length > 0) {
+            LwM2MClientOtaInfo infoSw = getOtaInfoUpdateSw();
+            if (infoSw != null ) {
+                String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
+                if (!fileChecksumSHA256.equals(infoSw.getChecksum())) {
+                    result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoSw.getChecksum();
+                    LOG.error(result);
+                    this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
+                    return result;
+                }
+                if (data.length != infoSw.getDataSize()) {
+                    result = "File writing error: failed FileSize.. Payload: " + data.length + " Original: " + infoSw.getDataSize();
+                    LOG.error(result);
+                    this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
+                    return result;
+                }
+            } else {
+                this.saveOtaInfoUpdateSwWithObject19(data);
+            }
+            this.setState(SoftwareUpdateState.DOWNLOADED.getCode());
+            String filePath = getPathDataOtaSW(infoSw);
+            Path dirPath = Paths.get(filePath).getParent();
+            try {
+                Files.createDirectories(dirPath);
+                renameOtaFilesToTmp(dirPath, PREF_SW, PREF_TMP);
+                try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                    fos.write(data);
+                    LOG.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
+                    deleteOtaFiles(dirPath, PREF_TMP);
+                    this.setState(SoftwareUpdateState.DELIVERED.getCode());
+                    this.setUpdateResult(SUCCESSFULLY_DOWNLOADED_VERIFIED.getCode());
+                    return result;
+                }
+
+            } catch (IOException e) {
+                result = "File writing error: " + e.getMessage();
+                LOG.error("File writing error: ", e);
+                this.updateResFailed(SoftwareUpdateResult.OUT_OFF_MEMORY.getCode());
+                return result;
+            }
+        } else {
+            result = "An empty response or error was received.";
+            LOG.error(result);
+            this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
+            return result;
+        }
+    }
+
+    private void updatingSuccessTest() {
         scheduler.schedule(() -> {
-            state.set(4);
-            updateResult.set(2);
-            fireResourceChange(7);
-            fireResourceChange(9);
+            try {
+                this.setState(SoftwareUpdateState.INSTALLED.getCode());
+                Thread.sleep(100);
+                this.setUpdateResult(SoftwareUpdateResult.SUCCESSFULLY_INSTALLED.getCode());
+                Thread.sleep(100);
+                this.setState(SoftwareUpdateState.INITIAL.getCode());
+                this.setUpdateResult(SoftwareUpdateResult.INITIAL.getCode());
+            } catch (Exception e) {
+            }
         }, 100, TimeUnit.MILLISECONDS);
     }
 
+
+    private void updateResFailed(int res) {
+        scheduler.schedule(() -> {
+            try {
+                this.setUpdateResult(res);
+                Thread.sleep(100);
+                this.setState(SoftwareUpdateState.INITIAL.getCode());
+                this.setUpdateResult(SoftwareUpdateResult.INITIAL.getCode());
+            } catch (Exception e) {
+            }
+        }, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private void startDownloadingSwUri() {
+        CoapClient client = new CoapClient(getPackageURI());
+        Configuration networkConfig = new Configuration();
+        networkConfig.set(CoapConfig.BLOCKWISE_STRICT_BLOCK2_OPTION, true);
+        networkConfig.set(CoapConfig.BLOCKWISE_ENTITY_TOO_LARGE_AUTO_FAILOVER, true);
+        networkConfig.set(CoapConfig.BLOCKWISE_STATUS_LIFETIME, DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS, TimeUnit.SECONDS);
+        networkConfig.set(CoapConfig.MAX_RESOURCE_BODY_SIZE, 256 * 1024 * 1024);
+        networkConfig.set(CoapConfig.RESPONSE_MATCHING, CoapConfig.MatcherMode.RELAXED);
+        networkConfig.set(CoapConfig.PREFERRED_BLOCK_SIZE, 1024);
+        networkConfig.set(CoapConfig.MAX_MESSAGE_SIZE, 1024);
+        networkConfig.set(CoapConfig.MAX_RETRANSMIT, 4);
+
+
+        CoapEndpoint endpoint = new CoapEndpoint.Builder().setConfiguration(networkConfig)
+                .build();
+        client.setEndpoint(endpoint);
+        client.useCONs(); // Used Confirmable request
+        client.setTimeout(10000L); // Time out
+
+        Request request = new Request(CoAP.Code.GET);
+        request.setConfirmable(true); // Used Confirmable (CON)
+
+        LOG.info("Send CoAP-request to [{}]", getPackageURI());
+
+        client.advanced(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                byte[] payload = response.getPayload();
+                String resultSavePayload = startDownloadingSw(payload);
+                if (!resultSavePayload.isEmpty()) {
+                    LOG.error(resultSavePayload);
+                }
+            }
+
+            @Override
+            public void onError() {
+                LOG.error("An error occurred while retrieving the response.");
+            }
+        }, request);
+    }
+
+
+    private String getPathDataOtaSW(LwM2MClientOtaInfo infoSW) {
+        String fileName = infoSW == null || StringUtils.isEmpty(infoSW.getFileName()) ? SW_DATA_FILE_NANE_DEF : infoSW.getFileName();
+        return getOtaFolder() + "/" + fileName;
+    }
+
+
+    private void saveOtaInfoUpdateSwWithObject19(byte[] data) {
+        if (data != null && data.length > 0) {
+            LwM2MClientOtaInfo infoSw = getOtaInfoUpdateSw();
+            if (infoSw == null ) {
+                String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
+                infoSw = new LwM2MClientOtaInfo();
+                infoSw.setType(OtaPackageType.SOFTWARE);
+                infoSw.setFileName(SW_DATA_FILE_NANE_DEF);
+                infoSw.setChecksum(fileChecksumSHA256);
+                infoSw.setDataSize(data.length);
+                setOtaInfoUpdateSw(infoSw);
+                LOG.info("Create new SW info with default params.");
+            }
+        } else {
+            setOtaInfoUpdateSw(null);
+            LOG.info("New SW info is not Created with default params (PackageURI + testObject). data = null");
+            String path = getOtaFolder();
+            deleteOtaFiles(Paths.get(path), PREF_SW);
+            LOG.info("Delete all SW files from path: [{}/{}...]", path, PREF_SW);
+        }
+    }
+
+
+    /**
+     * This executable resource may have one argument.
+     * If used with no argument or argument is 0, the Package is removed i from the Device.
+     */
+    private void deleteSwFile(){
+        LwM2MClientOtaInfo infoSw = readOtaInfoFromFile(getPathInfoOtaSw());
+        if (infoSw != null) {
+            String filePath = getPathDataOtaSW(infoSw);
+            Path path = Paths.get(filePath);
+            deleteOtaFiles(path.getParent(), path.getFileName().toString());
+            LOG.info("[{}] successfully is removed from the Device", filePath);
+        }
+    }
 }

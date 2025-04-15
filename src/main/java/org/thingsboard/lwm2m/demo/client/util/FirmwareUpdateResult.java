@@ -15,19 +15,19 @@ public enum FirmwareUpdateResult {
     DEFERRED(11, "Firmware update deferred");
 
     private final int code;
-    private final String description;
+    private final String type;
 
-    FirmwareUpdateResult(int code, String description) {
+    FirmwareUpdateResult(int code, String type) {
         this.code = code;
-        this.description = description;
+        this.type = type;
     }
 
     public int getCode() {
         return code;
     }
 
-    public String getDescription() {
-        return description;
+    public String getType() {
+        return type;
     }
 
     public static FirmwareUpdateResult fromCode(int code) {

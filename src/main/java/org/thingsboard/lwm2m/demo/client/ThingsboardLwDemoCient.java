@@ -277,10 +277,10 @@ public class ThingsboardLwDemoCient {
         initializer.setInstancesForObject(DEVICE, new MyDevice());
         initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.testObject, cli.main.testOta));
 
-        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.testObject));
+        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.testObject, cli.main.testOta));
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0, cli.main.testObject),
-                new LwM2mBinaryAppDataContainer(1, cli.main.testObject));
+        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0),
+                new LwM2mBinaryAppDataContainer(1));
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
 
