@@ -66,8 +66,6 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 9);
     private static final String PACKAGE_NANE_DEF = "firmware";
     private static final String PACKAGE_VERSION_DEF = "1.0.0";
-    private static final String PREF_TMP = "_tmp";
-    private static final String PREF_FW = "FW";
 
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
             new DaemonThreadFactory(getClass().getSimpleName() + "-test-scope-delete-ota"));
@@ -151,12 +149,12 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             case 2:
                 if (this.getState() == FirmwareUpdateState.DOWNLOADED.getCode() && this.getUpdateResult() == FirmwareUpdateResult.INITIAL.getCode()) {
                     if (this.testObject || this.testOta) {
-                        startUpdating();
+                        startUpdatingFw();
                     }
                     this.updatingSuccessTest();
                     return ExecuteResponse.success();
                 } else {
-                    String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]", FirmwareUpdateState.fromCode(this.getState()).getDescription(), FirmwareUpdateResult.fromCode(this.getUpdateResult()).getDescription());
+                    String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]", FirmwareUpdateState.fromCode(this.getState()).getType(), FirmwareUpdateResult.fromCode(this.getUpdateResult()).getType());
                     LOG.error(errorMsg);
                     return ExecuteResponse.badRequest(errorMsg);
                 }
@@ -173,9 +171,9 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             case 0:
                 if (this.testObject) {
                     this.downloadingToDownloadedSuccessTest(resourceId);
-                    this.saveOtaInfoUpdateFwWithoutObject19((byte[]) value.getValue());
+                    this.saveOtaInfoUpdateFwWithObject19((byte[]) value.getValue());
                 } else if (this.testOta) {
-                    String resultSavePayload = startDownloading((byte[]) value.getValue());
+                    String resultSavePayload = startDownloadingFw((byte[]) value.getValue());
                     if (!StringUtils.isEmpty(resultSavePayload)) {
                         return WriteResponse.badRequest(resultSavePayload);
                     }
@@ -185,9 +183,9 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 this.setPackageURI((String) value.getValue());
                 if (this.testObject) {
                     this.downloadingToDownloadedSuccessTest(resourceId);
-                    this.saveOtaInfoUpdateFwWithoutObject19(null);
+                    this.saveOtaInfoUpdateFwWithObject19(null);
                 } else if (this.testOta) {
-                    this.startDownloadingUri();
+                    this.startDownloadingFwUri();
                 }
                 return WriteResponse.success();
             default:
@@ -214,6 +212,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setState(int state) {
         if (state != this.state.get()){
             this.state.set(state);
+            LOG.info("Update state FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateState.fromCode(this.state.get()).getType());
             fireResourceChange(3);
         }
 
@@ -225,6 +224,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setUpdateResult(int updateResult) {
         if (updateResult != this.updateResult.get()) {
             this.updateResult.set(updateResult);
+            LOG.info("Update result FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateResult.fromCode(this.updateResult.get()).getType());
             fireResourceChange(5);
         }
     }
@@ -298,7 +298,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         }, 100, TimeUnit.MILLISECONDS);
     }
 
-    private void startDownloadingUri() {
+    private void startDownloadingFwUri() {
         CoapClient client = new CoapClient(getPackageURI());
         Configuration networkConfig = new Configuration();
         networkConfig.set(CoapConfig.BLOCKWISE_STRICT_BLOCK2_OPTION, true);
@@ -326,7 +326,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             @Override
             public void onLoad(CoapResponse response) {
                 byte[] payload = response.getPayload();
-                String resultSavePayload = startDownloading(payload);
+                String resultSavePayload = startDownloadingFw(payload);
                 if (!resultSavePayload.isEmpty()) {
                     LOG.error(resultSavePayload);
                 }
@@ -339,7 +339,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         }, request);
     }
 
-    private void startUpdating() {
+    private void startUpdatingFw() {
         LwM2MClientOtaInfo infoFw = getOtaInfoUpdateFw();
         if (infoFw != null ) {
             writeOtaInfoToFile(getPathInfoOtaFw(), infoFw);
@@ -349,7 +349,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         }
     }
 
-    private String startDownloading(byte[] data) {
+    private String startDownloadingFw(byte[] data) {
         this.setState(FirmwareUpdateState.DOWNLOADING.getCode());
         String result = "";
         if (data != null && data.length > 0) {
@@ -371,7 +371,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                     return result;
                 }
             } else {
-                this.saveOtaInfoUpdateFwWithoutObject19(data);
+                this.saveOtaInfoUpdateFwWithObject19(data);
             }
             String filePath = getPathDataOtaFW(infoFw);
             Path dirPath = Paths.get(filePath).getParent();
@@ -405,7 +405,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         return getOtaFolder() + "/" + fileName;
     }
 
-    private void saveOtaInfoUpdateFwWithoutObject19(byte[] data) {
+    private void saveOtaInfoUpdateFwWithObject19(byte[] data) {
         if (data != null && data.length > 0) {
             LwM2MClientOtaInfo infoFw = getOtaInfoUpdateFw();
             if (infoFw == null ) {

@@ -14,25 +14,25 @@ java -jar thingsboard-lw-demo-client.jar [options]
 
 ## General Options
 
-| Option                                     | Description                                                                                                                                                                                                                                                                                     |
-|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                                       |
-| `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                                                                             |
-| `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. <br/>More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                                 |
-| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                                      |
-| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                              |
-| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default: `-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                             |
-| `-l, --lifetime`                           | Registration lifetime in seconds (default: `-l 300` in sec).                                                                                                                                                                                                                                    |
-| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                                   |
-| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                                      |
-| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. [See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                                 |
-| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software. [See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                                                                |
-| `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA). <br/>Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                         |
-| `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files.<br/> Test mode supports Object IDs 5 and 9, utilizing Object 19. <br/>Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`. |                                                                                                  |
-| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example: `-aa attr1=value1,attr2=value2`.                                                                                                                                                                                                |
-| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example: `-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                         |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example: `-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                              |
-| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example: `-jc`.                                                                                                                                                                                                                                    |
+| Option                                       | Description                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                                         |
+| `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                                                                               |
+| `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                                |
+| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                                    |
+| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                                |
+| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default:`-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                            |
+| `-l, --lifetime`                           | Registration lifetime in seconds (default:`-l 300` in sec).                                                                                                                                                                                                                                     |
+| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                                     |
+| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                                        |
+| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models.[See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                                       |
+| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software.[See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                                                            |
+| `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA).Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                          |
+| `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files. Test mode supports Object IDs 5 and 9, utilizing Object 19. Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`. |
+| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example:`-aa attr1=value1,attr2=value2`.                                                                                                                                                                                                 |
+| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example:`-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                          |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example:`-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                                  |
+| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example:`-jc`.                                                                                                                                                                                                                                     |
 
 **Note:** Only one of these parameters (`-tobj` or `-tota`) can be used at a time.
 
@@ -189,17 +189,46 @@ _Example update SW (`./ota/OtaSW.json`):_
 }
 ```
 
-
 ```sh
 java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota -tota
 ```
 
+##### 📦 LwM2M Software Update State Transitions
+
+###### ✅ Successful Software Update Scenario
+
+| Step | SoftwareUpdateState      | SoftwareUpdateResult                     | Description                               |
+| ---- | ------------------------ | ---------------------------------------- | ----------------------------------------- |
+| 1    | `INITIAL (0)`          | `INITIAL (0)`                          | Initial state before any download starts  |
+| 2    | `DOWNLOAD_STARTED (1)` | `DOWNLOADING (1)`                      | Download process has started              |
+| 3    | `DOWNLOADED (2)`       | `DOWNLOADING (1)` | Package downloaded and integrity verified |
+| 4    | `DELIVERED (3)`        | `SUCCESSFULLY_DOWNLOADED_VERIFIED (3)` | Package ready to be installed             |
+| 5    | `INSTALLED (4)`        | `SOFTWARE_SUCCESSFULLY_INSTALLED (2)`  | Software successfully installed           |
+| 6    | `INITIAL (0)`          | `INITIAL (0)`                          | Returned to initial state after Uninstall |
+
+
+###### ❌ Invalid Checksum Scenario
+
+| Step | SoftwareUpdateState      | SoftwareUpdateResult                     | Description                                     |
+| ---- | ------------------------ | ---------------------------------------- | ----------------------------------------------- |
+| 1    | `INITIAL (0)`          | `INITIAL (0)`                          | Initial state before download                   |
+| 2    | `DOWNLOAD_STARTED (1)` | `DOWNLOADING (1)`                      | Download has started                            |
+| 3    | `DOWNLOADED (2)`       | `PACKAGE_INTEGRITY_CHECK_FAILURE (53)` | Package download completed, but checksum failed |
+| 4    | `INITIAL (0)`          | `INITIAL (0)`                          | Returned to initial state after failure         |
+
+###### ℹ️ Notes
+
+- `SoftwareUpdateState` defines the current lifecycle phase of the software update process.
+- `SoftwareUpdateResult` reflects the latest result of an update attempt.
+- The `DELIVERED` state is reached only if the integrity is verified and the package is ready to be installed.
+- After a successful `Install` or `Uninstall` operation, the state resets to `INITIAL (0)`.
+
 ## Location Options
 
-| Option                     | Description                                                                                                                                      |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-pos, --initial-position` | Set the device's initial location (latitude, longitude). Format: `-pos lat:long` (default: random). Syntax example: `-pos 34.122222:118.4111111` |
-| `-sf, --scale-factor`      | Scaling factor for position updates (default: `1.0`). Syntax example: `-sf 3.0`.                                                                 |
+| Option                       | Description                                                                                                                                         |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-pos, --initial-position` | Set the device's initial location (latitude, longitude). Format:`-pos lat:long` (default: random). Syntax example: `-pos 34.122222:118.4111111` |
+| `-sf, --scale-factor`      | Scaling factor for position updates (default:`1.0`). Syntax example: `-sf 3.0`.                                                                 |
 
 ### pos
 
@@ -242,7 +271,7 @@ this.scaleFactor = `1.0`;
 1. RANDOM.nextInt(180) for latitude
 
 * a random value between 0 and 179 is assigned, keeping it within the adjusted [0, 180] range.
-*
+* 
 
 ```markdown
 `-sf 3.0`
@@ -288,10 +317,10 @@ this.longitude = `298.4111111`;
 
 ## DTLS (Security) Options
 
-| Option                              | Description                                                                                                                                                                                                                                                                                                      |
-|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-r, --rehanshake-on-update`        | Force rehandshake on registration update. Syntax example: `r`.                                                                                                                                                                                                                                                   |
-| `-f, --force-full-handshake`        | By default client will try to resume DTLS session by using abbreviated Handshake. This option force to always do a full handshake. Syntax example: `f`.                                                                                                                                                          |
+| Option                                | Description                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-r, --rehanshake-on-update`        | Force rehandshake on registration update. Syntax example:`r`.                                                                                                                                                                                                                                                  |
+| `-f, --force-full-handshake`        | By default client will try to resume DTLS session by using abbreviated Handshake. This option force to always do a full handshake. Syntax example:`f`.                                                                                                                                                         |
 | `-cid, --connection-id`             | Enable DTLS connection ID (default: off). Control usage of DTLS connection ID: - 'on' to activate Connection ID support (same as -cid 0); - 'off' to deactivate it; - Positive value define the size in byte of CID generated;  0 value means we accept to use CID but will not generated one for foreign peer." |
 | `-c, --cipher-suites`               | List of cipher suites to use (comma-separated). Define cipher suites to use. CipherCuite enum value separated by ',' without spaces. E.g: TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM.                                                                                                                   |
 | `-oc, --support-deprecated-ciphers` | Enable support for deprecated cipher suites. Syntax example:`-oc`.                                                                                                                                                                                                                                             |
@@ -342,8 +371,8 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 
 #### Register with the ThingsBoard server (mode with DTLS):
 
-| Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
-|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Option                           | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `-i, --psk-identity`           | Set the LWM2M or Bootstrap server PSK identity in ascii.                                                                                                                                                                                                                                                                                                                                                                            |
 | `-p, --psk-key`                | Set the LWM2M or Bootstrap server Pre-Shared-Key in hexa.                                                                                                                                                                                                                                                                                                                                                                           |
 | `-cprik, --client-private-key` | The path to your client private key file, The private key should be in PKCS#8 format (DER encoding).                                                                                                                                                                                                                                                                                                                                |
@@ -351,8 +380,8 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 | `-spubk, --server-public-key`  | "The path to your server public key file. The public Key should be in SubjectPublicKeyInfo format (DER encoding).                                                                                                                                                                                                                                                                                                                   |
 | `-ccert, --client-certificate` | The path to your client certificate file.", The certificate Common Name (CN) should generaly be equal to the client endpoint name (see -n option).", The certificate should be in X509v3 format (DER encoding).                                                                                                                                                                                                                     |
 | `-scert, --server-certificate` | The path to your server certificate file (see -certificate-usage option). The certificate should be in X509v3 format (DER encoding).                                                                                                                                                                                                                                                                                                |
-| `-cu, --certificate-usage`     | Certificate Usage (as integer) defining how to use server certificate",  - 0 : CA constraint";  - 1 : service certificate constraint; - 2 : trust anchor assertion"; - 3 : domain issued certificate (Default value) [Usage are described at](https://tools.ietf.org/html/rfc6698#section-2.1.1)                                                                                                                                    |
-| `-ts, --truststore`            | The path to  : ", - a root certificate file to trust, - OR a folder containing trusted certificates, - OR trust store URI; Certificates must be in in X509v3 format (DER encoding); URI format:  file://<path-to-store>#<password>#<alias-pattern> Where :  - path-to-store is path to pkcs12 trust store file, - alias-pattern can be used to filter trusted certificates and can also be empty to get all,  Default: empty store. |
+| `-cu, --certificate-usage`     | Certificate Usage (as integer) defining how to use server certificate",  - 0 : CA constraint";  - 1 : service certificate constraint; - 2 : trust anchor assertion"; - 3 : domain issued certificate (Default value)[Usage are described at](https://tools.ietf.org/html/rfc6698#section-2.1.1)                                                                                                                                        |
+| `-ts, --truststore`            | The path to  : ", - a root certificate file to trust, - OR a folder containing trusted certificates, - OR trust store URI; Certificates must be in in X509v3 format (DER encoding); URI format:  file://## Where :  - path-to-store is path to pkcs12 trust store file, - alias-pattern can be used to filter trusted certificates and can also be empty to get all,  Default: empty store. |
 
 ##### Use DTLS with PSK authentication:
 
@@ -371,7 +400,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.i
 ##### Use DTLS with X509 authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2 
+java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2
 ```
 
 ## Notes
@@ -442,17 +471,17 @@ And in your logback config:
 
 ### Enables you to execute some dynamic commands from the Interactive Console.
 
-| Commands: | Description                                                                                                                                                                                                          |
-|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `help`    | Display help information about the specified command.                                                                                                                                                                |
-| `list`    | List available Objects, Instances and Resources. For example: `list` or `list 5` for ObjectId.                                                                                                                       |
-| `create`  | Enable a new Object. Format: `create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`. |
-| `delete`  | Desable a Object. . Format: `delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                     |
-| `send`    | Send data to server.                                                                                                                                                                                                 |
-| `collect` | Collect data to send it later with 'send' command                                                                                                                                                                    |
-| `move`    | Simulate client mouvement.                                                                                                                                                                                           |
-| `update`  | Trigger a registration update.                                                                                                                                                                                       |
-| `reboot`  | Restart client without update object.                                                                                                                                                                                |
+| Commands:   | Description                                                                                                                                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `help`    | Display help information about the specified command.                                                                                                                                                                             |
+| `list`    | List available Objects, Instances and Resources. For example:`list` or `list 5` for ObjectId.                                                                                                                                 |
+| `create`  | Enable a new Object. Format:`create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`. |
+| `delete`  | Desable a Object. . Format:`delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                             |
+| `send`    | Send data to server.                                                                                                                                                                                                              |
+| `collect` | Collect data to send it later with 'send' command                                                                                                                                                                                 |
+| `move`    | Simulate client mouvement.                                                                                                                                                                                                        |
+| `update`  | Trigger a registration update.                                                                                                                                                                                                    |
+| `reboot`  | Restart client without update object.                                                                                                                                                                                             |
 
 #### move
 
@@ -468,12 +497,12 @@ Explanation:
 **send** → Sends data to the server.
 */3303/0/5700*=`25.3` → Specifies the LwM2M resource to update:
 
-| Params: | Description                           |
-|---------|---------------------------------------|
-| `3303`  | Object ID (Temperature Sensor).       |
-| `0`     | Instance ID.                          |
-| `5700`  | Resource ID (Sensor Value).           |
-| `25.3`  | New value for the resource.           |
+| Params:  | Description                     |
+| -------- | ------------------------------- |
+| `3303` | Object ID (Temperature Sensor). |
+| `0`    | Instance ID.                    |
+| `5700` | Resource ID (Sensor Value).     |
+| `25.3` | New value for the resource.     |
 
 ```sh
 send `/3303/0/5700=25.3`
@@ -481,10 +510,10 @@ send `/3303/0/5700=25.3`
 
 This updates multiple resources at once:
 
-| Params:              | Description                                            |
-|----------------------|--------------------------------------------------------|
-| `/3323/1/5601=10.5`  | Updates Min Value for Object 3323 (Power Measurement). |
-| `/3323/1/5602=50.8`  | Updates Max Value.                                     |
+| Params:               | Description                                            |
+| --------------------- | ------------------------------------------------------ |
+| `/3323/1/5601=10.5` | Updates Min Value for Object 3323 (Power Measurement). |
+| `/3323/1/5602=50.8` | Updates Max Value.                                     |
 
 ```sh
 send /3323/1/5601=10.5 /3323/1/5602=50.8
@@ -500,12 +529,12 @@ Explanation:
 
 */3303/0/5700*=`22.5` → Specifies the LwM2M resource to collect:
 
-| Params: | Description                           |
-|---------|---------------------------------------|
-| `3303`  | Object ID (Temperature Sensor).       |
-| `0`     | Instance ID.                          |
-| `5700`  | Resource ID (Sensor Value).           |
-| `22.5`  | New value for the resource.           |
+| Params:  | Description                     |
+| -------- | ------------------------------- |
+| `3303` | Object ID (Temperature Sensor). |
+| `0`    | Instance ID.                    |
+| `5700` | Resource ID (Sensor Value).     |
+| `22.5` | New value for the resource.     |
 
 ```sh
 collect /3303/0/5700=22.5
@@ -523,3 +552,4 @@ send
 * _Collects_ `15.7` as the Min Value for Power Measurement.
 * _Collects_ `48.2` as the Max Value for Power Measurement.
 * _Sends_ `all` collected `values at once`.
+

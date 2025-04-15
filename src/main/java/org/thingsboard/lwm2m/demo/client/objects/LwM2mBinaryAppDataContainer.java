@@ -35,12 +35,7 @@ import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
@@ -85,7 +80,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
     private Integer appID = -1;
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 4, 5);
     private final Timer timer;
-    private boolean objectForTest;
+    private final Random rng = new Random();
 
     public LwM2mBinaryAppDataContainer() {
         // notify new date each 5 second
@@ -99,8 +94,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
         }, 5000, 5000);
     }
 
-    public LwM2mBinaryAppDataContainer(Integer id, boolean objectForTest) {
-        this.objectForTest = objectForTest;
+    public LwM2mBinaryAppDataContainer(Integer id) {
         if (id != null) this.setId(id);
         // notify new date each 5 second
         this.timer = new Timer("19 - Device-Current Time");
@@ -218,15 +212,21 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
                 }
                 value.getInstances().values().forEach(v -> {
                     this.data.put(v.getId(), (byte[]) v.getValue());
-                    if (FW_INFO_19_INSTANCE_ID.equals(this.id)){
+                    if (FW_INFO_19_INSTANCE_ID.equals(this.id) || SW_INFO_19_INSTANCE_ID.equals(this.id)) {
                         String infoNodeStr = new String((byte[]) v.getValue());
                         JsonNode infoNode = Utils.toJsonNode(infoNodeStr);
                         LwM2MClientOtaInfo otaInfo = treeToValue(infoNode, LwM2MClientOtaInfo.class);
-                        otaInfo.setType(OtaPackageType.FIRMWARE);
-                        String fileName = otaInfo.getFileName() == null ? FW_DATA_FILE_NANE_DEF : "FW_" + otaInfo.getFileName();
+                        String fileName = otaInfo.getFileName() == null ? FW_DATA_FILE_NANE_DEF : PREF_FW + otaInfo.getFileName();
+                        OtaPackageType otaPackageType = OtaPackageType.FIRMWARE;
+                         if (SW_INFO_19_INSTANCE_ID.equals(this.id)) {
+                            fileName = otaInfo.getFileName() == null ? SW_DATA_FILE_NANE_DEF : PREF_SW + otaInfo.getFileName();
+                            otaPackageType = OtaPackageType.SOFTWARE;
+                        }
+                        otaInfo.setType(otaPackageType);
                         otaInfo.setFileName(fileName);
-                        setOtaInfoUpdateFw(otaInfo);
-                        LOG.info("otainfo: [{}], value: {}", getOtaInfoUpdateFw(), v.getValue());
+                        setOtaInfoUpdate(otaInfo);
+                        LOG.info("otainfo: [{}], value: {}", otaInfo, v.getValue());
+
                     }
                 });
                 return true;
@@ -241,7 +241,8 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
     private Map<Integer, byte[]> getData() {
         if (data == null) {
             this.data = new HashMap<>();
-            this.data.put(0, new byte[]{(byte) 0xAC});
+            int newData = rng.nextInt(20);
+            this.data.put(0, new byte[]{(byte) newData});
         }
         return data;
     }
