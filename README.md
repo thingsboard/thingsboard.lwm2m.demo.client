@@ -154,9 +154,9 @@ _Example update FW (`./ota/OtaFW.json`):_
     "version": "1.1",
     "_commentFileName": "The name of the firmware file, located in the same directory as this JSON file.",
     "fileName": "otaPackageFW.bin",
-    "_commentFileChecksumSHA256": "SHA-256 checksum of the file fileName.",
+    "_commentChecksum": "SHA-256 checksum of the file fileName.",
     "checksum": "07385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf800",
-    "_commentFileSize": "Size of the file fileName in bytes.",
+    "_commentDataSize": "Size of the file fileName in bytes.",
     "dataSize": 8283052
 }
 ```
@@ -182,9 +182,9 @@ _Example update SW (`./ota/OtaSW.json`):_
     "version": "1.1",
     "_commentFileName": "The name of the softmware file, located in the same directory as this JSON file.",
     "fileName": "otaPackageSW.bin",
-    "_commentFileChecksumSHA256": "SHA-256 checksum of the file fileName.",
+    "_commentChecksum": "SHA-256 checksum of the file fileName.",
     "checksum": "12385bf4c3c8065987a5eaadd7e6639c28e56e350ed80688df8d497679ebf8cd",
-    "_commentFileSize": "Size of the file fileName in bytes.",
+    "_commentDataSize": "Size of the file fileName in bytes.",
     "dataSize": 9283056
 }
 ```
