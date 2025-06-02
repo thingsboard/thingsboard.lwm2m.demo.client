@@ -604,7 +604,7 @@ or
 java -jar thingsboard-lw-demo-client-{version}.jar
 ```
 
-#### 🔹 Run in NoSec mode (RL = local server: localhost; port = 5685)
+#### 🔹 Run in NoSec mode (URL = local server: localhost; port = 5685)
 
 ```bash
 java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://localhost:5685 -n MyClientNoSec
