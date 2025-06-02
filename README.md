@@ -421,7 +421,7 @@ To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo 
 
 ### More logs on ThingsBoard LwM2M Demo Client
 
-#### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`. See [How to activate more log?](#how-to-activate-more-log)
+#### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`, see [How to activate more log?](#how-to-activate-more-log)
 
 ```sh
 java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -v
