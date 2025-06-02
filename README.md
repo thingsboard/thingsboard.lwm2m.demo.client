@@ -553,3 +553,89 @@ send
 * _Collects_ `48.2` as the Max Value for Power Measurement.
 * _Sends_ `all` collected `values at once`.
 
+## 🚀 Building from Sources
+
+### 🔧 Clone the repository
+
+```bash
+git clone https://github.com/thingsboard/thingsboard.lwm2m.demo.client.git
+cd thingsboard.lwm2m.demo.client
+```
+
+### 🛠 Build the project
+
+```bash
+mvn clean install
+```
+
+or, to skip tests:
+
+```bash
+mvn clean package -DskipTests
+```
+
+---
+
+## ▶️ Running as a Plain Java Application
+
+### 📄 Using the JAR file
+
+The built JAR is located at:
+
+```
+target/thingsboard-lw-demo-client-4.1.0.jar
+```
+
+#### 🔹 Default run
+
+```bash
+java -jar target/thingsboard-lw-demo-client-4.1.0.jar
+```
+
+#### 🔹 Run in NoSec mode (local server)
+
+```bash
+java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coap://localhost:5685 -n TbLwm2mClientNoSec
+```
+
+#### 🔹 Run in DTLS (PSK) mode (local server)
+
+```bash
+java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coaps://localhost:5685 -n TbLwm2mClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+```
+
+#### 🔹 Run in NoSec mode (demo.thingsboard.io)
+
+```bash
+java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coap://demo.thingsboard.io:5685 -n TbLwm2mClientNoSec
+```
+
+#### 🔹 Run in DTLS (PSK) mode (demo.thingsboard.io)
+
+```bash
+java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io:5686 -n TbLwm2mClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+```
+
+---
+
+## 🐳 Running with Docker
+
+> **Note:** Do not use `localhost` inside a Docker container — it refers to the container itself. Use your actual IP address (e.g., `192.168.x.x`) or `host.docker.internal` (on macOS/Windows). On Linux, consider using `--network host`.
+
+### 🔹 NoSec mode (Docker + host IP):
+
+```bash
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://192.168.28.74:5685 -n TbLwm2mClientNoSec
+```
+
+### 🔹 NoSec mode (Docker with host network on Linux):
+
+```bash
+docker run --rm -it --network host thingsboard/tb-lw-demo-client:latest -u coap://localhost:5685 -n TbLwm2mClientNoSec
+```
+
+### 🔹 DTLS (PSK) mode:
+
+```bash
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsboard.io:5686 -n TbLwm2mClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+```
