@@ -26,13 +26,13 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                                     |
 | `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                                        |
 | `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models.[See Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                                       |
-| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software.[See Use OTA from a custom folder:](#use-ota-from-a-custom-folder)                                                                                                                                                            |
+| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software.[See Using OTA from a Custom Folder](#using-ota-from-a-custom-folder)                                                                                                                                                            |
 | `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA).Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                          |
 | `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files. Test mode supports Object IDs 5 and 9, utilizing Object 19. Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`. |
-| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example:`-aa attr1=value1,attr2=value2`.                                                                                                                                                                                                 |
-| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example:`-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                          |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example:`-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                                  |
-| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example:`-jc`.                                                                                                                                                                                                                                     |
+| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example:`-aa attr1=value1,attr2=value2`.                                                                                                                                                                                       |
+| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example:`-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example:`-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                     |
+| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example:`-jc`.                                                                                                                                                                                                                           |
 
 **Note:** Only one of these parameters (`-tobj` or `-tota`) can be used at a time.
 
@@ -417,14 +417,14 @@ This program uses [SLF4J](https://en.wikipedia.org/wiki/SLF4J) as a logging faca
 
 Our demos use the [logback](https://logback.qos.ch/) backend. A verbosity option (`-v, -vv`, ...) allows changing the log level.
 
-To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo Client](#more-logs-on-thingsboard-lw-demo-client) or read the [logback documentation](https://logback.qos.ch/manual/configuration.html).
+To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo Client](#more-logs-on-thingsboard-lwm2m-demo-client) or read the [logback documentation](https://logback.qos.ch/manual/configuration.html).
 
 ### More logs on ThingsBoard LwM2M Demo Client
 
 #### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClient -v
+java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -v
 ```
 
 **Note:** Depending on the number of `v` elements, the logging level for the _"org.eclipse.leshan", "org.eclipse.californium"_ classes is set:
@@ -443,7 +443,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 Example:
 
 ```sh
-java -Dlogback.configurationFile="logback-config.xml" -jar target/thingsboard-lw-demo-client-{version}.jar
+java -Dlogback.configurationFile="logback-config.xml" -jar thingsboard-lw-demo-client-{version}.jar
 ```
 
 And in your logback config:
@@ -586,34 +586,58 @@ The built JAR is located at:
 target/thingsboard-lw-demo-client-4.1.0.jar
 ```
 
+or 
+
+```
+target/thingsboard-lw-demo-client-{version}.jar
+```
+
 #### 🔹 Default run
 
 ```bash
-java -jar target/thingsboard-lw-demo-client-4.1.0.jar
+java -jar thingsboard-lw-demo-client-4.1.0.jar
 ```
 
-#### 🔹 Run in NoSec mode (local server)
+or
 
 ```bash
-java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coap://localhost:5685 -n TbLwm2mClientNoSec
+java -jar thingsboard-lw-demo-client-{version}.jar
 ```
 
-#### 🔹 Run in DTLS (PSK) mode (local server)
+#### 🔹 Run in NoSec mode (RL = local server: localhost; port = 5685)
 
 ```bash
-java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coaps://localhost:5685 -n TbLwm2mClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://localhost:5685 -n MyClientNoSec
 ```
 
-#### 🔹 Run in NoSec mode (demo.thingsboard.io)
+#### 🔹 Run in DTLS (PSK) mode (URL = local server: localhost; port = 5686)
 
 ```bash
-java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coap://demo.thingsboard.io:5685 -n TbLwm2mClientNoSec
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
-#### 🔹 Run in DTLS (PSK) mode (demo.thingsboard.io)
+#### 🔹 Run in NoSec mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
 
 ```bash
-java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io:5686 -n TbLwm2mClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://demo.thingsboard.io -n MyClientNoSec
+```
+
+or 
+
+```bash
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://coap.tbqa.cloud -n MyClientNoSec
+```
+
+#### 🔹 Run in DTLS (PSK) mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
+
+```bash
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+```
+
+or
+
+```bash
+java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://coap.tbqa.cloud -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
 ```
 
 ---
@@ -624,18 +648,37 @@ java -jar target/thingsboard-lw-demo-client-4.1.0.jar -u coaps://demo.thingsboar
 
 ### 🔹 NoSec mode (Docker + host IP):
 
+- localhost -> Address = 192.168.28.74; Port = 5685.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://192.168.28.74:5685 -n TbLwm2mClientNoSec
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://192.168.28.74:5685 -n MyClientNoSec
 ```
 
-### 🔹 NoSec mode (Docker with host network on Linux):
-
+- URL = demo.thingsboard.io
 ```bash
-docker run --rm -it --network host thingsboard/tb-lw-demo-client:latest -u coap://localhost:5685 -n TbLwm2mClientNoSec
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
+```
+
+- coap.tbqa.cloud
+```bash
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://coap.tbqa.cloud -n MyClientNoSec
 ```
 
 ### 🔹 DTLS (PSK) mode:
 
+
+- localhost -> Address = 192.168.28.74; Port = 5686.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsboard.io:5686 -n TbLwm2mClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://192.168.28.74:5686 -n 	MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+```
+
+- demo.thingsboard.io
+
+```bash
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsboard.io -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+```
+
+- coap.tbqa.cloud
+
+```bash
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
