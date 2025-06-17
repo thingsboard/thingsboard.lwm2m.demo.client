@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2024 The Thingsboard Authors
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.thingsboard.lwm2m.demo.client.objects;
 
 import com.google.common.hash.Hashing;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -35,8 +36,6 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 import org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateResult;
@@ -63,9 +62,9 @@ import static org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateResult.*;
 import static org.thingsboard.lwm2m.demo.client.util.SoftwareUpdateState.*;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
+@Slf4j
 public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 4, 6, 7, 9);
     private static final String PACKAGE_NANE_DEF = "software";
     private static final String PACKAGE_VERSION_DEF = "1.0.0";
@@ -120,7 +119,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public ReadResponse read(LwM2mServer identity, int resourceId) {
         if (!identity.isSystem())
-            LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+            log.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
             case 0:
                 return ReadResponse.success(resourceId, getPkgName());
@@ -140,7 +139,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         String withArguments = "";
         if (!arguments.isEmpty())
             withArguments = " with arguments " + arguments;
-        LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
+        log.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
 
         switch (resourceId) {
             case 4: // This Resource is only executable when the value of the State Resource is DELIVERED
@@ -153,7 +152,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 } else {
                     String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]",
                             SoftwareUpdateState.fromUpdateStateSwByCode(this.getState()).getType(), SoftwareUpdateResult.fromUpdateResultSwByCode(this.getUpdateResult()).getType());
-                    LOG.error(errorMsg);
+                    log.error(errorMsg);
                     return ExecuteResponse.badRequest(errorMsg);
                 }
             case 6:
@@ -177,7 +176,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     @Override
     public WriteResponse write(LwM2mServer identity, boolean replace, int resourceId, LwM2mResource value) {
-        LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+        log.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
 
         switch (resourceId) {
             case 2:
@@ -212,7 +211,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setState(int state) {
         if (state != this.state.get()){
             this.state.set(state);
-            LOG.info("Update state on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 7, this.state.get(), SoftwareUpdateState.fromUpdateStateSwByCode(this.state.get()).getType());
+            log.info("Update state on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 7, this.state.get(), SoftwareUpdateState.fromUpdateStateSwByCode(this.state.get()).getType());
             fireResourceChange(7);
         }
 
@@ -225,7 +224,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setUpdateResult(int updateResult) {
         if (updateResult != this.updateResult.get()) {
             this.updateResult.set(updateResult);
-            LOG.info("Update result on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 9, this.updateResult.get(), SoftwareUpdateResult.fromUpdateResultSwByCode(this.updateResult.get()).getType());
+            log.info("Update result on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 9, this.updateResult.get(), SoftwareUpdateResult.fromUpdateResultSwByCode(this.updateResult.get()).getType());
             fireResourceChange(9);
         }
     }
@@ -253,7 +252,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private void setPackageURI(String packageURI) {
         if (!packageURI.equals(this.packageURI)) {
-            LOG.info("Write on Device packageURI: [{}]", packageURI);
+            log.info("Write on Device packageURI: [{}]", packageURI);
             fireResourceChange(1);
         }
         this.packageURI = packageURI;
@@ -286,7 +285,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             }
         }, 100, TimeUnit.MILLISECONDS);
         String msgResource = resourceId == 2 ? "Via resource 2." : "Via Resource 3 (PackageURI = " + this.getPackageURI() + ").";
-        LOG.info("Finish Write data SW. {}", msgResource);
+        log.info("Finish Write data SW. {}", msgResource);
     }
 
     private void startUpdatingSw() {
@@ -309,13 +308,13 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
                 if (!fileChecksumSHA256.equals(infoSw.getChecksum())) {
                     result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoSw.getChecksum();
-                    LOG.error(result);
+                    log.error(result);
                     this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
                     return result;
                 }
                 if (data.length != infoSw.getDataSize()) {
                     result = "File writing error: failed FileSize.. Payload: " + data.length + " Original: " + infoSw.getDataSize();
-                    LOG.error(result);
+                    log.error(result);
                     this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
                     return result;
                 }
@@ -330,7 +329,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 renameOtaFilesToTmp(dirPath, PREF_SW, PREF_TMP);
                 try (FileOutputStream fos = new FileOutputStream(filePath)) {
                     fos.write(data);
-                    LOG.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
+                    log.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
                     deleteOtaFiles(dirPath, PREF_TMP);
                     this.setState(SoftwareUpdateState.DELIVERED.getCode());
                     this.setUpdateResult(SUCCESSFULLY_DOWNLOADED_VERIFIED.getCode());
@@ -339,13 +338,13 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
             } catch (IOException e) {
                 result = "File writing error: " + e.getMessage();
-                LOG.error("File writing error: ", e);
+                log.error("File writing error: ", e);
                 this.updateResFailed(SoftwareUpdateResult.OUT_OFF_MEMORY.getCode());
                 return result;
             }
         } else {
             result = "An empty response or error was received.";
-            LOG.error(result);
+            log.error(result);
             this.updateResFailed(SoftwareUpdateResult.PACKAGE_CHECK_FAILURE.getCode());
             return result;
         }
@@ -400,7 +399,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         Request request = new Request(CoAP.Code.GET);
         request.setConfirmable(true); // Used Confirmable (CON)
 
-        LOG.info("Send CoAP-request to [{}]", getPackageURI());
+        log.info("Send CoAP-request to [{}]", getPackageURI());
 
         client.advanced(new CoapHandler() {
             @Override
@@ -408,13 +407,13 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 byte[] payload = response.getPayload();
                 String resultSavePayload = startDownloadingSw(payload);
                 if (!resultSavePayload.isEmpty()) {
-                    LOG.error(resultSavePayload);
+                    log.error(resultSavePayload);
                 }
             }
 
             @Override
             public void onError() {
-                LOG.error("An error occurred while retrieving the response.");
+                log.error("An error occurred while retrieving the response.");
             }
         }, request);
     }
@@ -437,14 +436,14 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 infoSw.setChecksum(fileChecksumSHA256);
                 infoSw.setDataSize(data.length);
                 setOtaInfoUpdateSw(infoSw);
-                LOG.info("Create new SW info with default params.");
+                log.info("Create new SW info with default params.");
             }
         } else {
             setOtaInfoUpdateSw(null);
-            LOG.info("New SW info is not Created with default params (PackageURI + testObject). data = null");
+            log.info("New SW info is not Created with default params (PackageURI + testObject). data = null");
             String path = getOtaFolder();
             deleteOtaFiles(Paths.get(path), PREF_SW);
-            LOG.info("Delete all SW files from path: [{}/{}...]", path, PREF_SW);
+            log.info("Delete all SW files from path: [{}/{}...]", path, PREF_SW);
         }
     }
 
@@ -459,7 +458,7 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             String filePath = getPathDataOtaSW(infoSw);
             Path path = Paths.get(filePath);
             deleteOtaFiles(path.getParent(), path.getFileName().toString());
-            LOG.info("[{}] successfully is removed from the Device", filePath);
+            log.info("[{}] successfully is removed from the Device", filePath);
         }
     }
 }

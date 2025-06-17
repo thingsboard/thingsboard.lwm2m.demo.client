@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.lwm2m.demo.client;
+package org.thingsboard.lwm2m.demo.client.service;
 
+import jakarta.annotation.PreDestroy;
+import org.springframework.stereotype.Component;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+@Component
+public class ShutdownHandler {
 
-@SpringBootApplication
-public class ThingsboardLwDemoCient {
+    private final LwM2mClientService clientService;
 
-    static {
-        // Define a default logback.configurationFile
-        String property = System.getProperty("logback.configurationFile");
-        if (property == null) {
-            System.setProperty("logback.configurationFile", "logback-config.xml");
-        }
+    public ShutdownHandler(LwM2mClientService clientService) {
+        this.clientService = clientService;
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(ThingsboardLwDemoCient.class, args);
+    @PreDestroy
+    public void onShutdown() {
+        clientService.stop();
     }
 }

@@ -1,12 +1,12 @@
 /**
- * Copyright © 2016-2024 The Thingsboard Authors
- * <p>
+ * Copyright © 2016-2025 The Thingsboard Authors
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +15,8 @@
  */
 package org.thingsboard.lwm2m.demo.client.objects;
 
-
 import com.google.common.hash.Hashing;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -35,8 +35,6 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 import org.thingsboard.lwm2m.demo.client.util.FirmwareUpdateResult;
@@ -60,9 +58,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.eclipse.californium.core.config.CoapConfig.DEFAULT_BLOCKWISE_STATUS_LIFETIME_IN_SECONDS;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
+@Slf4j
 public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FwLwM2MDevice.class);
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 9);
     private static final String PACKAGE_NANE_DEF = "firmware";
     private static final String PACKAGE_VERSION_DEF = "1.0.0";
@@ -119,7 +117,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public ReadResponse read(LwM2mServer identity, int resourceId) {
         if (!identity.isSystem())
-            LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+            log.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
             case 1:
                 return ReadResponse.success(resourceId, getPackageURI());
@@ -143,7 +141,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         String withArguments = "";
         if (!arguments.isEmpty())
             withArguments = " with arguments " + arguments;
-        LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
+        log.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceId, withArguments);
 
         switch (resourceId) {
             case 2:
@@ -155,7 +153,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                     return ExecuteResponse.success();
                 } else {
                     String errorMsg = String.format("Firmware was updated failed. Sate: [%s] result: [%s]", FirmwareUpdateState.fromCode(this.getState()).getType(), FirmwareUpdateResult.fromCode(this.getUpdateResult()).getType());
-                    LOG.error(errorMsg);
+                    log.error(errorMsg);
                     return ExecuteResponse.badRequest(errorMsg);
                 }
             default:
@@ -165,7 +163,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     @Override
     public WriteResponse write(LwM2mServer identity, boolean replace, int resourceId, LwM2mResource value) {
-        LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+        log.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
 
         switch (resourceId) {
             case 0:
@@ -199,7 +197,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     private void setPackageURI(String packageURI) {
         if (!packageURI.equals(this.packageURI)) {
-            LOG.info("Write on Device packageURI: [{}]", packageURI);
+            log.info("Write on Device packageURI: [{}]", packageURI);
             fireResourceChange(1);
         }
         this.packageURI = packageURI;
@@ -212,7 +210,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setState(int state) {
         if (state != this.state.get()){
             this.state.set(state);
-            LOG.info("Update state FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateState.fromCode(this.state.get()).getType());
+            log.info("Update state FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateState.fromCode(this.state.get()).getType());
             fireResourceChange(3);
         }
 
@@ -224,7 +222,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private void setUpdateResult(int updateResult) {
         if (updateResult != this.updateResult.get()) {
             this.updateResult.set(updateResult);
-            LOG.info("Update result FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateResult.fromCode(this.updateResult.get()).getType());
+            log.info("Update result FW on Device resource /{}/{}/{} [{}] [{}]", getModel().id, getId(), 3, this.state.get(), FirmwareUpdateResult.fromCode(this.updateResult.get()).getType());
             fireResourceChange(5);
         }
     }
@@ -269,7 +267,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
             }
         }, 100, TimeUnit.MILLISECONDS);
         String msgResource = resourceId == 0 ? "Via resource 0." : "Via Resource 1 (PackageURI = " + this.getPackageURI() + ").";
-        LOG.info("Finish Write data FW. {}", msgResource);
+        log.info("Finish Write data FW. {}", msgResource);
     }
 
     private void updatingSuccessTest() {
@@ -320,7 +318,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
         Request request = new Request(CoAP.Code.GET);
         request.setConfirmable(true); // Used Confirmable (CON)
 
-        LOG.info("Send CoAP-request to [{}]", getPackageURI());
+        log.info("Send CoAP-request to [{}]", getPackageURI());
 
         client.advanced(new CoapHandler() {
             @Override
@@ -328,13 +326,13 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 byte[] payload = response.getPayload();
                 String resultSavePayload = startDownloadingFw(payload);
                 if (!resultSavePayload.isEmpty()) {
-                    LOG.error(resultSavePayload);
+                    log.error(resultSavePayload);
                 }
             }
 
             @Override
             public void onError() {
-                LOG.error("An error occurred while retrieving the response.");
+                log.error("An error occurred while retrieving the response.");
             }
         }, request);
     }
@@ -358,14 +356,14 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 String fileChecksumSHA256 = Hashing.sha256().hashBytes(data).toString();
                 if (!fileChecksumSHA256.equals(infoFw.getChecksum())) {
                     result = "File writing error: failed ChecksumSHA256. Payload: " + fileChecksumSHA256 + " Original: " + infoFw.getChecksum();
-                    LOG.error(result);
+                    log.error(result);
                     // 5: Integrity check failure for new downloaded package.
                     this.updateResFailed(FirmwareUpdateResult.INTEGRITY_CHECK_FAILURE.getCode());
                     return result;
                 }
                 if (data.length != infoFw.getDataSize()) {
                     result = "File writing error: failed FileSize.. Payload: " + data.length + " Original: " + infoFw.getDataSize();
-                    LOG.error(result);
+                    log.error(result);
                     // 5: Integrity check failure for new downloaded package.
                     this.updateResFailed(FirmwareUpdateResult.INTEGRITY_CHECK_FAILURE.getCode());
                     return result;
@@ -380,7 +378,7 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 renameOtaFilesToTmp(dirPath, PREF_FW, PREF_TMP);
                 try (FileOutputStream fos = new FileOutputStream(filePath)) {
                     fos.write(data);
-                    LOG.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
+                    log.info("Data successfully saved to: \"{}\", size: [{}]", filePath, data.length);
                     this.setState(FirmwareUpdateState.DOWNLOADED.getCode());
                     deleteOtaFiles(dirPath, PREF_TMP);
                     return result;
@@ -388,13 +386,13 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
             } catch (IOException e) {
                 result = "File writing error: " + e.getMessage();
-                LOG.error("File writing error: ", e);
+                log.error("File writing error: ", e);
                 this.updateResFailed(FirmwareUpdateResult.NOT_ENOUGH_FLASH.getCode());
                 return result;
             }
         } else {
             result = "An empty response or error was received.";
-            LOG.error(result);
+            log.error(result);
             this.updateResFailed(FirmwareUpdateResult.INTEGRITY_CHECK_FAILURE.getCode());
             return result;
         }
@@ -416,14 +414,14 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
                 infoFw.setChecksum(fileChecksumSHA256);
                 infoFw.setDataSize(data.length);
                 setOtaInfoUpdateFw(infoFw);
-                LOG.info("Create new FW info with default params.");
+                log.info("Create new FW info with default params.");
             }
         } else {
             setOtaInfoUpdateFw(null);
-            LOG.info("New FW info is not Created with default params (PackageURI + testObject). data = null");
+            log.info("New FW info is not Created with default params (PackageURI + testObject). data = null");
             String path = getOtaFolder();
             deleteOtaFiles(Paths.get(path), PREF_FW);
-            LOG.info("Delete all FW files from path: [{}/{}...]", path, PREF_FW);
+            log.info("Delete all FW files from path: [{}/{}...]", path, PREF_FW);
         }
     }
 }

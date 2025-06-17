@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2024 The Thingsboard Authors
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.thingsboard.lwm2m.demo.client.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.scandium.dtls.MaxFragmentLengthExtension.Length;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
+import org.eclipse.leshan.core.model.LwM2mModelRepository;
+import org.eclipse.leshan.core.model.ObjectLoader;
+import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.thingsboard.lwm2m.demo.client.cli.ClientDemoCLI;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 
@@ -33,10 +37,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
+@Slf4j
 public class Utils {
-    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+
+    public static final int BINARY_APP_DATA_CONTAINER = 19;
+    public static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
+    public static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
+    public static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
+    public static final String CF_CONFIGURATION_HEADER = "Thingsboard Lwm2m Demo Client - " + Configuration.DEFAULT_HEADER;
+
 
     public static final String OTA_FOLDER_DEF = "./ota";
     public static final String FW_DATA_FILE_NANE_DEF = "FW_OtaPackage.bin";
@@ -54,6 +68,21 @@ public class Utils {
 
     public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
+    public static LwM2mModelRepository createModel(ClientDemoCLI cli) throws Exception {
+
+        List<ObjectModel> models = ObjectLoader.loadAllDefault();
+        models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
+        if (cli.main.modelsFolder != null) {
+            List<ObjectModel> modelsCli = ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true);
+            Set<Integer> idsToRemove = new HashSet<>();
+            for (ObjectModel model : modelsCli) {
+                idsToRemove.add(model.id);
+            }
+            models.removeIf(model -> idsToRemove.contains(model.id));
+            models.addAll(modelsCli);
+        }
+        return new LwM2mModelRepository(models);
+    }
     public static Length fromLength(int length) {
         for (Length l : Length.values()) {
             if (l.length() == length) {
@@ -99,7 +128,7 @@ public class Utils {
             Path dirPath = Paths.get(filePath).getParent();
             Files.createDirectories(dirPath);
             OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), info);
-            LOG.info("New otsInfo successfully saved to: \"{}\" [{}].", filePath, info);
+            log.info("New otsInfo successfully saved to: \"{}\" [{}].", filePath, info);
         } catch (IOException e) {
             throw new IllegalArgumentException("Can't write to file: \"" + filePath + "\" value: [" + info.toString() + "]", e);
         }
@@ -108,7 +137,7 @@ public class Utils {
         try {
             return OBJECT_MAPPER.readValue(new File(filePath), LwM2MClientOtaInfo.class);
         } catch (IOException e) {
-            LOG.error("Can't read from file: \"" + filePath + "\" OtaInfo. [{}]", e.getMessage());
+            log.error("Can't read from file: \"" + filePath + "\" OtaInfo. [{}]", e.getMessage());
             return null;
         }
     }
@@ -165,13 +194,13 @@ public class Utils {
                         try {
                             Files.move(p, target, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException e) {
-                            LOG.error("Failed rename file [{}] in directory: -> [{}] [{}]", fileName, directory, e.getMessage());
+                            log.error("Failed rename file [{}] in directory: -> [{}] [{}]", fileName, directory, e.getMessage());
                         }
-                        LOG.info("Renamed file: [{}] -> [{}]", p.getFileName(), target.getFileName());
+                        log.info("Renamed file: [{}] -> [{}]", p.getFileName(), target.getFileName());
 
                     });
         } catch (IOException e) {
-            LOG.error("Failed rename any file in directory: -> [{}] [{}]", directory, e.getMessage());
+            log.error("Failed rename any file in directory: -> [{}] [{}]", directory, e.getMessage());
         }
     }
 
@@ -185,7 +214,7 @@ public class Utils {
                         waitUntilDeleted(p, Duration.ofSeconds(1));
                     });
         } catch (IOException e) {
-            LOG.error("Failed to list directory: -> [{}] [{}]", directory, e.getMessage());
+            log.error("Failed to list directory: -> [{}] [{}]", directory, e.getMessage());
         }
     }
 
@@ -194,11 +223,11 @@ public class Utils {
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
-            LOG.error("Failed to delete file: -> [{}] [{}].", path, e.getMessage());
+            log.error("Failed to delete file: -> [{}] [{}].", path, e.getMessage());
         }
         while (System.currentTimeMillis() < deadline) {
             if (!Files.exists(path)) {
-                LOG.info("Successfully to delete file: -> [{}].", path);
+                log.info("Successfully to delete file: -> [{}].", path);
                 return true;
             }
             try {

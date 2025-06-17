@@ -1,20 +1,21 @@
-/*******************************************************************************
- * Copyright (c) 2022 Sierra Wireless and others.
+/**
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v20.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributors:
- *     Sierra Wireless - initial API and implementation
- *******************************************************************************/
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.thingsboard.lwm2m.demo.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.scandium.dtls.ClientHandshaker;
 import org.eclipse.californium.scandium.dtls.DTLSContext;
 import org.eclipse.californium.scandium.dtls.HandshakeException;
@@ -24,42 +25,40 @@ import org.eclipse.californium.scandium.dtls.ResumingServerHandshaker;
 import org.eclipse.californium.scandium.dtls.ServerHandshaker;
 import org.eclipse.californium.scandium.dtls.SessionAdapter;
 import org.eclipse.californium.scandium.dtls.SessionId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class DtlsSessionLogger extends SessionAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(DtlsSessionLogger.class);
 
     private SessionId sessionIdentifier = null;
 
     @Override
     public void handshakeStarted(Handshaker handshaker) throws HandshakeException {
         if (handshaker instanceof ResumingServerHandshaker) {
-            LOG.info("DTLS abbreviated Handshake initiated by server : STARTED ...");
+            log.info("DTLS abbreviated Handshake initiated by server : STARTED ...");
         } else if (handshaker instanceof ServerHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by server : STARTED ...");
+            log.info("DTLS Full Handshake initiated by server : STARTED ...");
         } else if (handshaker instanceof ResumingClientHandshaker) {
             sessionIdentifier = handshaker.getSession().getSessionIdentifier();
-            LOG.info("DTLS abbreviated Handshake initiated by client : STARTED ...");
+            log.info("DTLS abbreviated Handshake initiated by client : STARTED ...");
         } else if (handshaker instanceof ClientHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by client : STARTED ...");
+            log.info("DTLS Full Handshake initiated by client : STARTED ...");
         }
     }
 
     @Override
     public void contextEstablished(Handshaker handshaker, DTLSContext establishedContext) throws HandshakeException {
         if (handshaker instanceof ResumingServerHandshaker) {
-            LOG.info("DTLS abbreviated Handshake initiated by server : SUCCEED");
+            log.info("DTLS abbreviated Handshake initiated by server : SUCCEED");
         } else if (handshaker instanceof ServerHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by server : SUCCEED");
+            log.info("DTLS Full Handshake initiated by server : SUCCEED");
         } else if (handshaker instanceof ResumingClientHandshaker) {
             if (sessionIdentifier != null && sessionIdentifier.equals(handshaker.getSession().getSessionIdentifier())) {
-                LOG.info("DTLS abbreviated Handshake initiated by client : SUCCEED");
+                log.info("DTLS abbreviated Handshake initiated by client : SUCCEED");
             } else {
-                LOG.info("DTLS abbreviated turns into Full Handshake initiated by client : SUCCEED");
+                log.info("DTLS abbreviated turns into Full Handshake initiated by client : SUCCEED");
             }
         } else if (handshaker instanceof ClientHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by client : SUCCEED");
+            log.info("DTLS Full Handshake initiated by client : SUCCEED");
         }
     }
 
@@ -78,13 +77,13 @@ public class DtlsSessionLogger extends SessionAdapter {
         }
 
         if (handshaker instanceof ResumingServerHandshaker) {
-            LOG.info("DTLS abbreviated Handshake initiated by server : FAILED ({})", cause);
+            log.info("DTLS abbreviated Handshake initiated by server : FAILED ({})", cause);
         } else if (handshaker instanceof ServerHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by server : FAILED ({})", cause);
+            log.info("DTLS Full Handshake initiated by server : FAILED ({})", cause);
         } else if (handshaker instanceof ResumingClientHandshaker) {
-            LOG.info("DTLS abbreviated Handshake initiated by client : FAILED ({})", cause);
+            log.info("DTLS abbreviated Handshake initiated by client : FAILED ({})", cause);
         } else if (handshaker instanceof ClientHandshaker) {
-            LOG.info("DTLS Full Handshake initiated by client : FAILED ({})", cause);
+            log.info("DTLS Full Handshake initiated by client : FAILED ({})", cause);
         }
     }
 }

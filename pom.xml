@@ -1,40 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright © 2016-2025 The Thingsboard Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.0</version>
+        <version>3.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
     <artifactId>thingsboard-lw-demo-client</artifactId>
     <version>4.1.0</version>
+    <packaging>jar</packaging>
+
     <name>thingsboard-demo-client</name>
     <description>thingsboard-lw-demo-client</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+    <url>https://thingsboard.io/docs/reference/lwm2m-api/</url>
+    <inceptionYear>2016</inceptionYear>
+
     <properties>
-        <java.version>17</java.version>
-        <picocli.version>4.7.5</picocli.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <main.dir>${basedir}</main.dir>
+        <picocli.version>4.7.6</picocli.version>
         <californium.version>4.0.0-M2</californium.version>
         <leshan.version>2.0.0-M15</leshan.version>
         <leshan-tl.version>2.0.0-M17</leshan-tl.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <jackson-databind.version>2.17.2</jackson-databind.version>
         <guava.version>33.1.0-jre</guava.version>
+        <app.build.time>@build.timestamp@</app.build.time>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     </properties>
     <dependencies>
         <dependency>
@@ -56,8 +70,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -99,29 +112,88 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <header>${main.dir}/license-header-template.txt</header>
+                        <properties>
+                            <owner>The Thingsboard Authors</owner>
+                        </properties>
+                        <excludes>
+                            <exclude>**/README</exclude>
+                            <exclude>**/LICENSE</exclude>
+                            <exclude>**/src/main/resources/**</exclude>
+                            <exclude>**/*.properties</exclude>
+                            <exclude>**/*.log</exclude>
+                            <exclude>**/models/tmp/**</exclude>
+                        </excludes>
+                        <mapping>
+                            <proto>JAVADOC_STYLE</proto>
+                            <cql>DOUBLEDASHES_STYLE</cql>
+                            <scss>JAVADOC_STYLE</scss>
+                            <jsx>SLASHSTAR_STYLE</jsx>
+                            <tsx>SLASHSTAR_STYLE</tsx>
+                            <conf>SCRIPT_STYLE</conf>
+                            <gradle>JAVADOC_STYLE</gradle>
+                        </mapping>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/application.yml</include>
+                    <include>**/banner.txt</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/application.yml</exclude>
+                    <exclude>**/banner.txt</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                        </path>
-                        <path>
+                    <excludes>
+                        <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
+                        </exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <!-- JAR Plugin for Main-Class in manifest -->

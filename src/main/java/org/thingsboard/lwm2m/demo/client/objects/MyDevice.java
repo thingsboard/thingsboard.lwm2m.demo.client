@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2024 The Thingsboard Authors
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.thingsboard.lwm2m.demo.client.objects;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.Destroyable;
@@ -46,9 +47,8 @@ import java.util.TimerTask;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
+@Slf4j
 public class MyDevice extends BaseInstanceEnabler implements Destroyable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
     private static final Random RANDOM = new Random();
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 9, 10, 11, 13, 14, 15, 16, 17, 18,
@@ -80,7 +80,7 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public ReadResponse read(LwM2mServer server, int resourceid) {
         if (!server.isSystem())
-            LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
+            log.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
         switch (resourceid) {
         case 0:
             return ReadResponse.success(resourceid, getManufacturer());
@@ -126,7 +126,7 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
         String withArguments = "";
         if (!arguments.isEmpty())
             withArguments = " with arguments " + arguments;
-        LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceid, withArguments);
+        log.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceid, withArguments);
 
         if (resourceid == 4) {
             this.triggerRebootClient();
@@ -136,7 +136,7 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
 
     @Override
     public WriteResponse write(LwM2mServer server, boolean replace, int resourceid, LwM2mResource value) {
-        LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
+        log.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
 
         switch (resourceid) {
         case 13:

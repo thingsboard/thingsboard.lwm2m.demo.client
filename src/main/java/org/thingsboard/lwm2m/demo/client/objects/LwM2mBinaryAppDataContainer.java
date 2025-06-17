@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2024 The Thingsboard Authors
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.thingsboard.lwm2m.demo.client.objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -24,8 +25,6 @@ import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 import org.thingsboard.lwm2m.demo.client.util.Utils;
@@ -39,7 +38,7 @@ import java.util.*;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.*;
 
-
+@Slf4j
 public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements Destroyable {
 
     /**
@@ -69,8 +68,6 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
      * "value":4
      * },
      */
-
-    private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
     Map<Integer, byte[]> data;
     private Integer priority = 0;
@@ -135,7 +132,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
 
     @Override
     public WriteResponse write(LwM2mServer identity, boolean replace, int resourceId, LwM2mResource value) {
-        LOG.info("Write on Device resource /[{}]/[{}]/[{}]", getModel().id, getId(), resourceId);
+        log.info("Write on Device resource /[{}]/[{}]/[{}]", getModel().id, getId(), resourceId);
         switch (resourceId) {
             case 0:
                 if (setData(value, replace)) {
@@ -225,7 +222,7 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
                         otaInfo.setType(otaPackageType);
                         otaInfo.setFileName(fileName);
                         setOtaInfoUpdate(otaInfo);
-                        LOG.info("otainfo: [{}], value: {}", otaInfo, v.getValue());
+                        log.info("otainfo: [{}], value: {}", otaInfo, v.getValue());
 
                     }
                 });

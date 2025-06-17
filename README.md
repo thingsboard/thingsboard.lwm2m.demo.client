@@ -18,7 +18,7 @@ java -jar thingsboard-lw-demo-client.jar [options]
 | -------------------------------------------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                             |
 | `-V, --version`                            | Print version information and exit.                                                                                                                                                                                                                                                   |
-| `-v, --verbose`                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                            |
+|                            | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                            |
 | `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                            |
 | `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                    |
 | `-n, --endpoint-name`                      | Set the endpoint name for the client. Default:`-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                    |
@@ -368,6 +368,11 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.i
 ```sh
 java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
+or
+
+```sh
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
+```
 
 #### Register with the ThingsBoard server (mode with DTLS):
 
@@ -471,17 +476,25 @@ And in your logback config:
 
 ### Enables you to execute some dynamic commands from the Interactive Console.
 
-| Commands:   | Description                                                                                                                                                                                                                       |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `help`    | Display help information about the specified command.                                                                                                                                                                             |
-| `list`    | List available Objects, Instances and Resources. For example:`list` or `list 5` for ObjectId.                                                                                                                                 |
-| `create`  | Enable a new Object. Format:`create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`. |
-| `delete`  | Desable a Object. . Format:`delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                             |
-| `send`    | Send data to server.                                                                                                                                                                                                              |
-| `collect` | Collect data to send it later with 'send' command                                                                                                                                                                                 |
-| `move`    | Simulate client mouvement.                                                                                                                                                                                                        |
-| `update`  | Trigger a registration update.                                                                                                                                                                                                    |
-| `reboot`  | Restart client without update object.                                                                                                                                                                                             |
+**Note:**: 
+- The dynamic commands from the Interactive Console mode only works when the -v, --verbose option is enabled. 
+- For example, `-v` or `-vv` or `-vvv`, see [How to activate more log?](#how-to-activate-more-log)
+
+```shell
+ docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec -v
+```
+
+| Commands:    | Description                                                                                                                                                                                                                        |
+|:-------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `help`       | Display help information about the specified command.                                                                                                                                                                              |
+| `list`       | List available Objects, Instances and Resources. For example:`list` or `list 5` for ObjectId.                                                                                                                                      |
+| `create`     | Enable a new Object. Format:`create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`.                |
+| `delete`     | Desable a Object. . Format:`delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                                    |
+| `send`       | Send data to server.                                                                                                                                                                                                               |
+| `collect`    | Collect data to send it later with 'send' command                                                                                                                                                                                  |
+| `move`       | Simulate client mouvement.                                                                                                                                                                                                         |
+| `update`     | Trigger a registration update.                                                                                                                                                                                                     |
+| `reboot`     | Restart client without update object.                                                                                                                                                                                              |
 
 #### move
 
@@ -497,12 +510,12 @@ Explanation:
 **send** → Sends data to the server.
 */3303/0/5700*=`25.3` → Specifies the LwM2M resource to update:
 
-| Params:  | Description                     |
-| -------- | ------------------------------- |
-| `3303` | Object ID (Temperature Sensor). |
-| `0`    | Instance ID.                    |
-| `5700` | Resource ID (Sensor Value).     |
-| `25.3` | New value for the resource.     |
+| Params   | Description                      |
+|:---------|:---------------------------------|
+| `3303`   | Object ID (Temperature Sensor).  |
+| `0`      | Instance ID.                     |
+| `5700`   | Resource ID (Sensor Value).      |
+| `25.3`   | New value for the resource.      |
 
 ```sh
 send `/3303/0/5700=25.3`
@@ -510,8 +523,8 @@ send `/3303/0/5700=25.3`
 
 This updates multiple resources at once:
 
-| Params:               | Description                                            |
-| --------------------- | ------------------------------------------------------ |
+| Params              | Description                                            |
+|:--------------------|:-------------------------------------------------------|
 | `/3323/1/5601=10.5` | Updates Min Value for Object 3323 (Power Measurement). |
 | `/3323/1/5602=50.8` | Updates Max Value.                                     |
 
@@ -529,12 +542,12 @@ Explanation:
 
 */3303/0/5700*=`22.5` → Specifies the LwM2M resource to collect:
 
-| Params:  | Description                     |
-| -------- | ------------------------------- |
-| `3303` | Object ID (Temperature Sensor). |
-| `0`    | Instance ID.                    |
-| `5700` | Resource ID (Sensor Value).     |
-| `22.5` | New value for the resource.     |
+| Params   | Description                      |
+|:---------|:---------------------------------|
+| `3303`   | Object ID (Temperature Sensor).  |
+| `0`      | Instance ID.                     |
+| `5700`   | Resource ID (Sensor Value).      |
+| `22.5`   | New value for the resource.      |
 
 ```sh
 collect /3303/0/5700=22.5
@@ -644,13 +657,31 @@ java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://coap.tbqa.cloud -n MyC
 
 ## 🐳 Running with Docker
 
-> **Note:** Do not use `localhost` inside a Docker container — it refers to the container itself. Use your actual IP address (e.g., `192.168.x.x`) or `host.docker.internal` (on macOS/Windows). On Linux, consider using `--network host`.
+**Important:** When running the tb-lw-demo-client in a Docker container, do not use **localhost**, 127.0.0.1, or your host's 192.168.x.x IP for the LwM2M Server address.
+These will not resolve correctly from within the container.
+
+Correct way (on Linux):
+
+Use the Docker bridge gateway IP — usually 172.17.0.1 (the **docker0** interface):
+
+This address represents the host machine as seen from inside Docker.
+
+```shell
+#Command:
+ip a | grep docker0
+
+# Requst
+13: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether ...
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+    ...
+```
 
 ### 🔹 NoSec mode (Docker + host IP):
 
-- localhost -> Address = 192.168.28.74; Port = 5685.
+- localhost -> Address = 172.17.0.1; Port = 5685.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://192.168.28.74:5685 -n MyClientNoSec
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://172.17.0.1:5685 -n MyClientNoSec
 ```
 
 - URL = demo.thingsboard.io
@@ -665,10 +696,9 @@ docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://coap.tbqa.clo
 
 ### 🔹 DTLS (PSK) mode:
 
-
-- localhost -> Address = 192.168.28.74; Port = 5686.
+- localhost -> Address = 172.17.0.1; Port = 5686.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://192.168.28.74:5686 -n 	MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://172.17.0.1:5686 -n 	MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 - demo.thingsboard.io
@@ -682,3 +712,16 @@ docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsb
 ```bash
 docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
+
+
+Structure
+ThingsboardLwDemoClientClean/
+├── ThingsboardLwDemoCient.java
+├── cli/
+│   └── CommandLineRunnerImpl.java
+├── core/
+│   └── ClientFactory.java
+├── service/
+│   ├── LwM2mClientService.java
+│   └── ShutdownHandler.java
+

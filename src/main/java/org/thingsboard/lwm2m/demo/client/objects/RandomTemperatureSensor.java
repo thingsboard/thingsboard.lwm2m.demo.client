@@ -1,19 +1,21 @@
-/*******************************************************************************
- * Copyright (c) 2022    Sierra Wireless and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
+/**
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v20.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Contributors:
- *     Sierra Wireless - initial API and implementation
- *******************************************************************************/
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.thingsboard.lwm2m.demo.client.objects;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.Destroyable;
@@ -22,8 +24,6 @@ import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,9 +34,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class RandomTemperatureSensor extends BaseInstanceEnabler implements Destroyable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RandomTemperatureSensor.class);
 
     private static final String UNIT_CELSIUS = "cel";
     private static final int SENSOR_VALUE = 5700;
@@ -65,7 +64,7 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
 
     @Override
     public synchronized ReadResponse read(LwM2mServer server, int resourceId) {
-        LOG.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
+        log.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case MIN_MEASURED_VALUE:
             return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
@@ -82,7 +81,7 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
 
     @Override
     public synchronized ExecuteResponse execute(LwM2mServer server, int resourceId, Arguments arguments) {
-        LOG.info("Execute on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
+        log.info("Execute on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case RESET_MIN_MAX_MEASURED_VALUES:
             resetMinMaxMeasuredValues();

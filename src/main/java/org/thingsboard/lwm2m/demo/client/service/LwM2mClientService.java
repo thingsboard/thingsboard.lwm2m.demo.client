@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.lwm2m.demo.client;
+package org.thingsboard.lwm2m.demo.client.service;
 
+import org.eclipse.leshan.client.LeshanClient;
+import org.springframework.stereotype.Service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+@Service
+public class LwM2mClientService {
 
-@SpringBootApplication
-public class ThingsboardLwDemoCient {
+    private LeshanClient client;
 
-    static {
-        // Define a default logback.configurationFile
-        String property = System.getProperty("logback.configurationFile");
-        if (property == null) {
-            System.setProperty("logback.configurationFile", "logback-config.xml");
-        }
+    public void start(LeshanClient client) {
+        this.client = client;
+        client.start();
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(ThingsboardLwDemoCient.class, args);
+    public void stop() {
+        if (client != null) {
+            client.destroy(true);
+        }
     }
 }

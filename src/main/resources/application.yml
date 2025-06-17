@@ -1,0 +1,4 @@
+app:
+  version: '@project.version@'
+  title: '@project.name@'
+  build.time: '@maven.build.timestamp@'

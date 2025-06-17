@@ -1,19 +1,21 @@
-/*******************************************************************************
- * Copyright (c) 2022    Sierra Wireless and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
+/**
+ * Copyright © 2016-2025 The Thingsboard Authors
  *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v20.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Contributors:
- *     Sierra Wireless - initial API and implementation
- *******************************************************************************/
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.thingsboard.lwm2m.demo.client.cli.interactive;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -49,8 +51,8 @@ import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.Lis
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.MoveCommand;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.SendCommand;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.UpdateCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Model.CommandSpec;
@@ -73,9 +75,9 @@ import java.util.Map;
                  UpdateCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
          customSynopsis = { "" },
          synopsisHeading = "")
-public class InteractiveCommands extends JLineInteractiveCommands implements Runnable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InteractiveCommands.class);
+@Slf4j
+public class InteractiveCommands extends JLineInteractiveCommands implements Runnable {
 
     private final LeshanClient client;
     private final LwM2mModelRepository repository;
@@ -314,15 +316,15 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
                 sendCommand.parent.printf("There is no registered server to send to.%n").flush();
             }
             for (final LwM2mServer server : registeredServers.values()) {
-                LOG.info("Sending Data to {} using {}.", server, sendCommand.contentFormat);
+                log.info("Sending Data to {} using {}.", server, sendCommand.contentFormat);
                 ResponseCallback<SendResponse> responseCallback = (response) -> {
                     if (response.isSuccess())
-                        LOG.info("Data sent successfully to {} [{}].", server, response.getCode());
+                        log.info("Data sent successfully to {} [{}].", server, response.getCode());
                     else
-                        LOG.info("Send data to {} failed [{}] : {}.", server, response.getCode(),
+                        log.info("Send data to {} failed [{}] : {}.", server, response.getCode(),
                                 response.getErrorMessage() == null ? "" : response.getErrorMessage());
                 };
-                ErrorCallback errorCallback = (e) -> LOG.warn("Unable to send data to {}.", server, e);
+                ErrorCallback errorCallback = (e) -> log.warn("Unable to send data to {}.", server, e);
                 sendCommand.parent.client.getSendService().sendData(server, sendCommand.contentFormat, paths,
                         sendCommand.timeout, responseCallback, errorCallback);
             }
@@ -346,7 +348,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
             }
             // for each server send data
             for (final LwM2mServer server : registeredServers.values()) {
-                LOG.info("Sending Collected data to {} using {}.", server, sendCommand.contentFormat);
+                log.info("Sending Collected data to {} using {}.", server, sendCommand.contentFormat);
                 // send collected data
                 SendService sendService = sendCommand.parent.client.getSendService();
                 try {
