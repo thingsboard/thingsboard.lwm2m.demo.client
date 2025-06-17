@@ -713,9 +713,10 @@ docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsb
 docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
+## 📁 Project Structure
 
-Structure
-ThingsboardLwDemoClientClean/
+```
+Thingsboard Lwm2m Demo Client
 ├── ThingsboardLwDemoCient.java
 ├── cli/
 │   └── CommandLineRunnerImpl.java
@@ -724,4 +725,4 @@ ThingsboardLwDemoClientClean/
 ├── service/
 │   ├── LwM2mClientService.java
 │   └── ShutdownHandler.java
-
+```
