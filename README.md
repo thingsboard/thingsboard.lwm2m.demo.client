@@ -629,28 +629,16 @@ java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://localhost:5685 -n My
 java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
-#### 🔹 Run in NoSec mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
+#### 🔹 Run in NoSec mode (URL = demo.thingsboard.io)
 
 ```bash
 java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
-or 
-
-```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://coap.tbqa.cloud -n MyClientNoSec
-```
-
-#### 🔹 Run in DTLS (PSK) mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
+#### 🔹 Run in DTLS (PSK) mode (URL = demo.thingsboard.io)
 
 ```bash
 java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
-```
-
-or
-
-```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://coap.tbqa.cloud -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
 ```
 
 ---
@@ -689,11 +677,6 @@ docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://172.17.0.1
 docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
-- coap.tbqa.cloud
-```bash
-docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://coap.tbqa.cloud -n MyClientNoSec
-```
-
 ### 🔹 DTLS (PSK) mode:
 
 - localhost -> Address = 172.17.0.1; Port = 5686.
@@ -705,12 +688,6 @@ docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://172.17.0.
 
 ```bash
 docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://demo.thingsboard.io -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
-```
-
-- coap.tbqa.cloud
-
-```bash
-docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 ## 📁 Project Structure
