@@ -9,7 +9,7 @@ The **ThingsBoard LwM2M Demo Client** is a command-line tool for simulating an L
 To run the client, use the following command:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar [options]
+java -jar thingsboard-lwm2m-demo-client.jar [options]
 ```
 
 ## General Options
@@ -39,9 +39,9 @@ java -jar thingsboard-lw-demo-client.jar [options]
 ### Use object models from a custom folder:
 
 ```sh
-java -jar thingsboard-lw-demo-client.jar -m ./
-java -jar thingsboard-lw-demo-client.jar -m ./models
-java -jar thingsboard-lw-demo-client.jar -m /absolute_path/models
+java -jar thingsboard-lwm2m-demo-client.jar -m ./
+java -jar thingsboard-lwm2m-demo-client.jar -m ./models
+java -jar thingsboard-lwm2m-demo-client.jar -m /absolute_path/models
 ```
 
 ### Using Test OTA or Test Object
@@ -53,7 +53,7 @@ These modes are designed to test different data acquisition algorithms and proce
 **Large File Limitation:** The file size must not exceed **8192 bytes**.
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -tobj
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -tobj
 ```
 
 #### Using Test with `-tota`
@@ -61,7 +61,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -tobj
 **Large File Limitation:** The file size must not exceed `256 * 1024 * 1024` bytes (i.e., `268,435,456` bytes).
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -tota
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -tota
 ```
 
 #### Using OTA from a Custom Folder
@@ -71,9 +71,9 @@ Default value of file name for FW: `otaPackageFW.bin`
 Default value of file name for SW: `otaPackageSW.bin`
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -o ./
-java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota
-java -jar thingsboard-lw-demo-client-{version}.jar -o /absolute_path/ota
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -o ./
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -o ./ota
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -o /absolute_path/ota
 ```
 
 #### Using OTA Updates with ThingsBoard LwM2M Demo Client
@@ -190,7 +190,7 @@ _Example update SW (`./ota/OtaSW.json`):_
 ```
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -o ./ota -tota
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -o ./ota -tota
 ```
 
 ##### 📦 LwM2M Software Update State Transitions
@@ -330,7 +330,7 @@ this.longitude = `298.4111111`;
 #### Cipher suites to use
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -c TLS_PSK_WITH_AES_128_CCM_8,TLS_PSK_WITH_AES_128_CCM
 ```
 
 #### DTLS Connection ID (CID) support
@@ -338,7 +338,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 * - 'on' to activate Connection ID support (same as `-cid 0`). `0` value means we accept to use CID but will not generated one for foreign peer.
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 0
 ```
 
 _What is **`-cid`**?_
@@ -360,13 +360,13 @@ _What Does **`-cid`** Affect?_
 * Security Considerations. A longer CID value increases uniqueness but adds packet overhead. Too short CID values (e.g., 1) might increase the risk of collisions.
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 4
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret -cid 4
 ```
 
 #### Register with the ThingsBoard server (mode NoSec):
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 or
 
@@ -391,7 +391,7 @@ docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thing
 ##### Use DTLS with PSK authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key mySecret
 ```
 
 ##### Use DTLS with RPK authentication:
@@ -399,13 +399,13 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.i
 Use CoAP over DTLS with Raw Public Key, -cpubk -cprik -spubk options should be used together. [RPK](https://github.com/eclipse/leshan/wiki/Credential-files-format)
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientRpk -cpubk ./clietPubK.der -cprik ./clientKey.der -spubk ./serverPubK.der
 ```
 
 ##### Use DTLS with X509 authentication:
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coaps://demo.thingsboard.io -n MyClientX509 -ccert ./clientX509v3.der -scert ./serverX509v3.der (optional)-cu 2
 ```
 
 ## Notes
@@ -429,7 +429,7 @@ To activate more logs for these demos, see [More logs on ThingsBoard LwM2M Demo 
 #### After start with options to increase verbosity. For example, `-v` or `-vv` or `-vvv`, see [How to activate more log?](#how-to-activate-more-log)
 
 ```sh
-java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -v
+java -jar thingsboard-lwm2m-demo-client-{version}.jar -u coap://demo.thingsboard.io -n MyClientNoSec -v
 ```
 
 **Note:** Depending on the number of `v` elements, the logging level for the _"org.eclipse.leshan", "org.eclipse.californium"_ classes is set:
@@ -448,7 +448,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 Example:
 
 ```sh
-java -Dlogback.configurationFile="logback-config.xml" -jar thingsboard-lw-demo-client-{version}.jar
+java -Dlogback.configurationFile="logback-config.xml" -jar thingsboard-lwm2m-demo-client-{version}.jar
 ```
 
 And in your logback config:
@@ -596,61 +596,61 @@ mvn clean package -DskipTests
 The built JAR is located at:
 
 ```
-target/thingsboard-lw-demo-client-4.1.0.jar
+target/thingsboard-lwm2m-demo-client-4.1.0.jar
 ```
 
 or 
 
 ```
-target/thingsboard-lw-demo-client-{version}.jar
+target/thingsboard-lwm2m-demo-client-{version}.jar
 ```
 
 #### 🔹 Default run
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar
 ```
 
 or
 
 ```bash
-java -jar thingsboard-lw-demo-client-{version}.jar
+java -jar thingsboard-lwm2m-demo-client-{version}.jar
 ```
 
 #### 🔹 Run in NoSec mode (URL = local server: localhost; port = 5685)
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://localhost:5685 -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://localhost:5685 -n MyClientNoSec
 ```
 
 #### 🔹 Run in DTLS (PSK) mode (URL = local server: localhost; port = 5686)
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 #### 🔹 Run in NoSec mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://demo.thingsboard.io -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 or 
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coap://coap.tbqa.cloud -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coap://coap.tbqa.cloud -n MyClientNoSec
 ```
 
 #### 🔹 Run in DTLS (PSK) mode (URL = demo.thingsboard.io or coap.tbqa.cloud)
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
 ```
 
 or
 
 ```bash
-java -jar thingsboard-lw-demo-client-4.1.0.jar -u coaps://coap.tbqa.cloud -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lwm2m-demo-client-4.1.0.jar -u coaps://coap.tbqa.cloud -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
 ```
 
 ---
