@@ -27,12 +27,12 @@
     </parent>
 
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
-    <artifactId>thingsboard-lw-demo-client</artifactId>
+    <artifactId>thingsboard-lwm2m-demo-client</artifactId>
     <version>4.1.0</version>
     <packaging>jar</packaging>
 
     <name>thingsboard-demo-client</name>
-    <description>thingsboard-lw-demo-client</description>
+    <description>thingsboard-lwm2m-demo-client</description>
     <url>https://thingsboard.io/docs/reference/lwm2m-api/</url>
     <inceptionYear>2016</inceptionYear>
 

@@ -16,6 +16,6 @@
 
 FROM thingsboard/openjdk17:bookworm-slim
 
-COPY ./thingsboard-lw-demo-client*.jar /app.jar
+COPY ./thingsboard-lwm2m-demo-client*.jar /app.jar
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]

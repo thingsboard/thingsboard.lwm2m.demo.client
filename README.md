@@ -371,7 +371,7 @@ java -jar thingsboard-lw-demo-client-{version}.jar -u coap://demo.thingsboard.io
 or
 
 ```sh
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 #### Register with the ThingsBoard server (mode with DTLS):
@@ -481,7 +481,7 @@ And in your logback config:
 - For example, `-v` or `-vv` or `-vvv`, see [How to activate more log?](#how-to-activate-more-log)
 
 ```shell
- docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec -v
+ docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec -v
 ```
 
 | Commands:    | Description                                                                                                                                                                                                                        |
@@ -681,36 +681,36 @@ ip a | grep docker0
 
 - localhost -> Address = 172.17.0.1; Port = 5685.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://172.17.0.1:5685 -n MyClientNoSec
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://172.17.0.1:5685 -n MyClientNoSec
 ```
 
 - URL = demo.thingsboard.io
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 - coap.tbqa.cloud
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coap://coap.tbqa.cloud -n MyClientNoSec
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://coap.tbqa.cloud -n MyClientNoSec
 ```
 
 ### 🔹 DTLS (PSK) mode:
 
 - localhost -> Address = 172.17.0.1; Port = 5686.
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://172.17.0.1:5686 -n 	MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://172.17.0.1:5686 -n 	MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 - demo.thingsboard.io
 
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://demo.thingsboard.io -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://demo.thingsboard.io -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 - coap.tbqa.cloud
 
 ```bash
-docker run --rm -it thingsboard/tb-lw-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coaps://coap.tbqa.cloud -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 ## 📁 Project Structure
