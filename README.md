@@ -484,17 +484,17 @@ And in your logback config:
  docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec -v
 ```
 
-| Commands:    | Description                                                                                                                                                                                                                        |
-|:-------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `help`       | Display help information about the specified command.                                                                                                                                                                              |
-| `list`       | List available Objects, Instances and Resources. For example:`list` or `list 5` for ObjectId.                                                                                                                                      |
-| `create`     | Enable a new Object. Format:`create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`.                |
-| `delete`     | Desable a Object. . Format:`delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                                    |
-| `send`       | Send data to server.                                                                                                                                                                                                               |
-| `collect`    | Collect data to send it later with 'send' command                                                                                                                                                                                  |
-| `move`       | Simulate client mouvement.                                                                                                                                                                                                         |
-| `update`     | Trigger a registration update.                                                                                                                                                                                                     |
-| `reboot`     | Restart client without update object.                                                                                                                                                                                              |
+| Commands:                                          | Description                                                                                                                                                                                                         |
+|:---------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `help`                                             | Display help information about the specified command.                                                                                                                                                               |
+| `list`                                             | List available Objects, Instances and Resources. For example:`list` or `list 5` for ObjectId.                                                                                                                       |
+| `create`                                           | Enable a new Object. Format:`create ${ObjectId}`. For example: `create 5`, the Object with ID = `5` is created with the latest available version, `1.2`. or `create 5 1.1` created ObjectId = `5` with ver = `1.1`. |
+| `delete`                                           | Desable a Object. . Format:`delete ${ObjectId}`. For example: `delete 5`, the Object with ID = `5` is desabled.                                                                                                     |
+| `send current-value`  <br/> `send collected-value` | Send data to server. Usage:  send (current-value or collected-value)  [-c=<contentFormat>]                                                                                                                          |                                                                                                                                                       |
+| `collect`                                          | Collect data to send it later with 'send' command                                                                                                                                                                   |
+| `move`                                             | Simulate client mouvement.                                                                                                                                                                                          |
+| `updateRegistration`                               | Trigger a registration update.                                                                                                                                                                                      |
+| `reboot`                                           | Restart client without update object.                                                                                                                                                                               |
 
 #### move
 
@@ -508,28 +508,22 @@ And in your logback config:
 Explanation:
 
 **send** → Sends data to the server.
-*/3303/0/5700*=`25.3` → Specifies the LwM2M resource to update:
+*/3303/0/5700*=`13.6` → Specifies the LwM2M resource to update:
 
-| Params   | Description                      |
-|:---------|:---------------------------------|
-| `3303`   | Object ID (Temperature Sensor).  |
-| `0`      | Instance ID.                     |
-| `5700`   | Resource ID (Sensor Value).      |
-| `25.3`   | New value for the resource.      |
+| Params   | Description                     |
+|:---------|:--------------------------------|
+| `3303`   | Object ID (Temperature Sensor). |
+| `0`      | Instance ID.                    |
+| `5700`   | Resource ID (Sensor Value).     |
+| `13.6`   | Current value for the resource. |
 
 ```sh
-send `/3303/0/5700=25.3`
+send current-value /3303/0/5700
 ```
 
-This updates multiple resources at once:
-
-| Params              | Description                                            |
-|:--------------------|:-------------------------------------------------------|
-| `/3323/1/5601=10.5` | Updates Min Value for Object 3323 (Power Measurement). |
-| `/3323/1/5602=50.8` | Updates Max Value.                                     |
-
 ```sh
-send /3323/1/5601=10.5 /3323/1/5602=50.8
+collect /3303/0/5700 /3303/0/5701
+send collected-value /3303/0/5700 /3303/0/5701
 ```
 
 #### collect
@@ -542,29 +536,27 @@ Explanation:
 
 */3303/0/5700*=`22.5` → Specifies the LwM2M resource to collect:
 
-| Params   | Description                      |
-|:---------|:---------------------------------|
-| `3303`   | Object ID (Temperature Sensor).  |
-| `0`      | Instance ID.                     |
-| `5700`   | Resource ID (Sensor Value).      |
-| `22.5`   | New value for the resource.      |
+| Params   | Description                              |
+|:---------|:-----------------------------------------|
+| `3303`   | Object ID (Temperature Sensor).          |
+| `0`      | Instance ID.                             |
+| `5700`   | Resource ID (Sensor Value).              |
+| `22.5`   | Current value for the resource with Time |
 
 ```sh
-collect /3303/0/5700=22.5
-send
-```
-
-```sh
-collect /3323/1/5601=15.7
-collect /3323/1/5602=48.2
-send
+collect /3303/0/5700
+collect /3323/1/5601 /3323/1/5602
 ```
 
 **This sequence:**
 
-* _Collects_ `15.7` as the Min Value for Power Measurement.
-* _Collects_ `48.2` as the Max Value for Power Measurement.
-* _Sends_ `all` collected `values at once`.
+* _Collect_ `15.7` as the Min Value for Power Measurement.
+* _Collect_ `48.2` as the Max Value for Power Measurement, and other...
+* _Sends_ `all` collected `all values are sent in one request at once, each value will have its own time`.
+
+```sh
+send collected-value /3303/0/5700 /3323/1/5601 /3323/1/5602
+````
 
 ## 🚀 Building from Sources
 

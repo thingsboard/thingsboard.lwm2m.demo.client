@@ -50,8 +50,10 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     private double currentTemp = 20d;
     private double minMeasuredValue = currentTemp;
     private double maxMeasuredValue = currentTemp;
+    final private int verboseLevel;
 
     public RandomTemperatureSensor() {
+        this.verboseLevel = 0;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
         scheduler.scheduleAtFixedRate(new Runnable() {
 
@@ -59,24 +61,41 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
             public void run() {
                 adjustTemperature();
             }
-        }, 2, 2, TimeUnit.SECONDS);
+        }, 10, 10, TimeUnit.SECONDS);
+    }
+    public RandomTemperatureSensor(int verboseLevel) {
+        this.verboseLevel = verboseLevel;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
+        scheduler.scheduleAtFixedRate(new Runnable() {
+
+            @Override
+            public void run() {
+                adjustTemperature();
+            }
+        }, 10, 10, TimeUnit.SECONDS);
     }
 
     @Override
     public synchronized ReadResponse read(LwM2mServer server, int resourceId) {
-        log.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
-        switch (resourceId) {
-        case MIN_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
-        case MAX_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
-        case SENSOR_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(currentTemp));
-        case UNITS:
-            return ReadResponse.success(resourceId, UNIT_CELSIUS);
-        default:
-            return super.read(server, resourceId);
-        }
+        return switch (resourceId) {
+            case MIN_MEASURED_VALUE -> {
+                printReadLog(resourceId, getTwoDigitValue(minMeasuredValue));
+                yield ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
+            }
+            case MAX_MEASURED_VALUE -> {
+                printReadLog(resourceId, getTwoDigitValue(maxMeasuredValue));
+                yield ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
+            }
+            case SENSOR_VALUE -> {
+                printReadLog(resourceId, getTwoDigitValue(currentTemp));
+                yield ReadResponse.success(resourceId, getTwoDigitValue(currentTemp));
+            }
+            case UNITS -> {
+                printReadLog(resourceId, UNIT_CELSIUS);
+                yield ReadResponse.success(resourceId, UNIT_CELSIUS);
+            }
+            default -> super.read(server, resourceId);
+        };
     }
 
     @Override
@@ -88,6 +107,12 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
             return ExecuteResponse.success();
         default:
             return super.execute(server, resourceId, arguments);
+        }
+    }
+
+    private void printReadLog (int resourceId, Object value) {
+        if (this.verboseLevel > 0) {
+            log.info("Read on Temperature resource /{}/{}/{} = {}", getModel().id, getId(), resourceId, value);
         }
     }
 

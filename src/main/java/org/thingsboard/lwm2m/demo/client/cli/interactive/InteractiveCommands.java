@@ -50,9 +50,7 @@ import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.Del
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.ListCommand;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.MoveCommand;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.SendCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.UpdateCommand;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.UpdateRegistrationCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Model.CommandSpec;
@@ -72,7 +70,12 @@ import java.util.Map;
          description = "@|bold,underline Thingsboard Lwm2m Demo Client Interactive Console :|@%n",
          footer = { "%n@|italic Press Ctl-C to exit.|@%n" },
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
-                 UpdateCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
+                 UpdateRegistrationCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
+        // TODO "update"
+        // InteractiveCommands.UpdateResourceValues.class },
+        // Readme: | `update`                                           | Update value of Resource and `send current-value`.  Note: Resource must be `RW`
+        // Example: update /5/0/1=pathForUrl /3/0/14=setUtcOffset((String)
+
          customSynopsis = { "" },
          synopsisHeading = "")
 
@@ -222,10 +225,10 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     }
 
     /**
-     * A command to send an update request.
+     * A command to send an updateRegistration request.
      */
-    @Command(name = "update", description = "Trigger a registration update.", headerHeading = "%n", footer = "")
-    static class UpdateCommand implements Runnable {
+    @Command(name = "updateRegistration", description = "Trigger a registration update.", headerHeading = "%n", footer = "")
+    static class UpdateRegistrationCommand implements Runnable {
 
         @ParentCommand
         InteractiveCommands parent;
@@ -331,11 +334,11 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         }
     }
 
-    @Command(name = "collected-value",
-             description = "Send values collected with 'collect' command",
-             headerHeading = "%n",
-             footer = "")
+    @Command(name = "collected-value",  description = "Send values collected with 'send' command", headerHeading = "%n", footer = "")
     static class SendCollectedValue implements Runnable {
+        @Parameters(description = "Paths of data to send.", converter = StringLwM2mPathConverter.class, arity = "1..*")
+        private List<String> paths;
+
         @ParentCommand
         SendCommand sendCommand;
 
@@ -427,4 +430,121 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
             }
         }
     }
+
+    // TODO "update"
+    /*
+
+    @Command(name = "update", description = "Update resource values on the client (example: update /5/0/1=pathForUrl)")
+    static class UpdateResourceValues implements Runnable {
+
+        @Parameters(description = "Paths with values to update, format: /objectId/instanceId/resourceId=value", arity = "1..*")
+        private List<String> resourceUpdates;
+
+        @ParentCommand
+        InteractiveCommands parent;
+
+        @Override
+        public void run() {
+            Map<String, String> parsedUpdates = parsePaths(resourceUpdates);
+            if (parsedUpdates.isEmpty()) {
+                System.err.println("No valid updates.");
+                return;
+            }
+
+            LwM2mObjectTree objectTree = parent.client.getObjectTree();
+            List<String> success = new ArrayList<>();
+            List<String> errors = new ArrayList<>();
+
+            for (Map.Entry<String, String> entry : parsedUpdates.entrySet()) {
+                String path = entry.getKey();
+                String valueStr = entry.getValue();
+
+                try {
+                    String[] parts = path.replaceFirst("^/", "").split("/");
+                    if (parts.length != 3) {
+                        errors.add(path + " (invalid path format)");
+                        continue;
+                    }
+
+                    int objectId = Integer.parseInt(parts[0]);
+                    int instanceId = Integer.parseInt(parts[1]);
+                    int resourceId = Integer.parseInt(parts[2]);
+
+//                    LwM2mObjectEnabler object = objectTree.get(objectId);
+//                    if (object == null) {
+//                        errors.add(path + " (object not found)");
+//                        continue;
+//                    }
+//
+////                    WriteResponse response = object.write(LwM2mServer var1, WriteRequest var2);
+//
+//                    Map<Integer, LwM2mInstanceEnabler> instances = object.getAvailableInstanceIds();
+//                    LwM2mInstanceEnabler instance = instances.get(instanceId);
+//                    if (instance == null) {
+//                        errors.add(path + " (instance not found)");
+//                        continue;
+//                    }
+
+                    // Пробуємо виконати write
+//                    if (supportsWrite(instance)) {
+//                        Number numberValue = tryParseNumber(valueStr);
+//                        LwM2mResource resource = LwM2mSingleResource.newFloatResource(resourceId, numberValue.floatValue());
+//
+//                        WriteResponse response = instance.write(
+//                                null, // LwM2mServer identity, не потрібен тут
+//                                false, // replace
+//                                resourceId,
+//                                resource
+//                        );
+//
+//                        if (response.isSuccess()) {
+//                            success.add(String.format("%s = %s (OK)", path, valueStr));
+//                        } else {
+//                            errors.add(String.format("%s = %s (write failed: %s)", path, valueStr, response.getCode()));
+//                        }
+//                    } else {
+//                        errors.add(path + " (write() not supported by instance)");
+//                    }
+                } catch (Exception e) {
+                    errors.add(path + " (exception: " + e.getMessage() + ")");
+                }
+            }
+
+            success.forEach(s -> System.out.println("✅ " + s));
+            errors.forEach(e -> System.err.println("❌ " + e));
+        }
+
+        private Map<String, String> parsePaths(List<String> entries) {
+            Map<String, String> map = new LinkedHashMap<>();
+            for (String entry : entries) {
+                int eq = entry.indexOf('=');
+                if (eq == -1 || eq == entry.length() - 1) continue;
+                map.put(entry.substring(0, eq), entry.substring(eq + 1));
+            }
+            return map;
+        }
+
+        private boolean supportsWrite(LwM2mInstanceEnabler instance) {
+            try {
+                Method m = instance.getClass().getMethod("write", LwM2mServer.class, boolean.class, int.class, LwM2mResource.class);
+                return m.getDeclaringClass() != LwM2mInstanceEnabler.class;
+            } catch (NoSuchMethodException e) {
+                return false;
+            }
+        }
+
+        private Number tryParseNumber(String val) {
+            try {
+                return Integer.parseInt(val);
+            } catch (NumberFormatException e) {
+                try {
+                    return Float.parseFloat(val);
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("Value is not a number: " + val);
+                }
+            }
+        }
+    }
+    **/
+
 }
