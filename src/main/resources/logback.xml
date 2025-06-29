@@ -2,7 +2,7 @@
 <!DOCTYPE configuration>
 <configuration scan="true" scanPeriod="10 seconds">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="CLI" class="org.thingsboard.lwm2m.demo.client.logging.ConsoleAppenderCLI">
         <encoder>
             <pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
@@ -42,7 +42,7 @@
 <!--    <logger name="com.microsoft.azure.servicebus.primitives.CoreMessageReceiver" level="OFF" />-->
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="CLI"/>
     </root>
 
 

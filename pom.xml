@@ -28,7 +28,7 @@
 
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
     <artifactId>thingsboard-lwm2m-demo-client</artifactId>
-    <version>4.1.1</version>
+    <version>4.1.2</version>
     <packaging>jar</packaging>
 
     <name>thingsboard-demo-client</name>
@@ -116,6 +116,16 @@
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
             <version>${picocli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.26.0</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-shell-jline3</artifactId>
+            <version>4.7.5</version>
         </dependency>
     </dependencies>
 

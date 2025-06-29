@@ -51,7 +51,6 @@ public class Utils {
     public static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
     public static final String CF_CONFIGURATION_HEADER = "Thingsboard Lwm2m Demo Client - " + Configuration.DEFAULT_HEADER;
 
-
     public static final String OTA_FOLDER_DEF = "./ota";
     public static final String FW_DATA_FILE_NANE_DEF = "FW_OtaPackage.bin";
     public static final String FW_INFO_FILE_NANE_DEF = "FW_Ota.json";

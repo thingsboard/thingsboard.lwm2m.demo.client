@@ -15,10 +15,10 @@
  */
 package org.thingsboard.lwm2m.demo.client.cli;
 
-import org.eclipse.leshan.core.demo.cli.interactive.InteractiveCLI;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCLI;
 import org.thingsboard.lwm2m.demo.client.core.ClientFactory;
 import org.thingsboard.lwm2m.demo.client.service.LwM2mClientService;
 import org.eclipse.leshan.client.LeshanClient;
@@ -28,6 +28,9 @@ import picocli.CommandLine;
 import java.io.PrintWriter;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.createModel;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI_false;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI_true;
 
 @Component
 public class CommandLineRunnerImpl implements CommandLineRunner {
@@ -44,25 +47,25 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
     public void run(String... args) {
         ClientDemoCLI cli = new ClientDemoCLI();
         CommandLine command = new CommandLine(cli).setParameterExceptionHandler(new ShortErrorMessageHandler());
-
         int exitCode = command.execute(args);
         if (exitCode != 0 || command.isUsageHelpRequested() || command.isVersionHelpRequested()) {
             System.exit(exitCode);
         }
-
         try {
             LwM2mModelRepository repository = createModel(cli);
             LeshanClient client = clientFactory.create(cli, repository);
-            if (cli.helpsOptions.getVerboseLevel() > 0) {
+            if (cli.main.interactiveConsole) {
                 // Print commands help
-                InteractiveCLI console = new InteractiveCLI(new InteractiveCommands(client, repository));
-                console.showHelp();
+                TBInteractiveCLI interactiveCLI = new TBInteractiveCLI(new TBInteractiveCommands(client, repository));
+                interactiveCLI.showHelp();
                 // Start the client
                 clientService.start(client);
                 // Start interactive console
-                console.start();
+                System.setProperty(propertyIsCLI, propertyIsCLI_true);
+                interactiveCLI.start();
             } else {
                 // Start the client without Interactive console
+                System.setProperty(propertyIsCLI, propertyIsCLI_false);
                 clientService.start(client);
             }
         } catch (Exception e) {

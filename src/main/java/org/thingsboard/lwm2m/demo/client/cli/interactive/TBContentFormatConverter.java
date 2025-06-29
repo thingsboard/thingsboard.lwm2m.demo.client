@@ -20,15 +20,15 @@ import picocli.CommandLine.ITypeConverter;
 
 import java.util.Arrays;
 
-public class ContentFormatConverter implements ITypeConverter<ContentFormat> {
+public class TBContentFormatConverter implements ITypeConverter<ContentFormat> {
 
     private final ContentFormat[] allowedContentFormat;
 
-    public ContentFormatConverter() {
+    public TBContentFormatConverter() {
         this.allowedContentFormat = ContentFormat.knownContentFormat;
     }
 
-    public ContentFormatConverter(ContentFormat... allowedContentFormats) {
+    public TBContentFormatConverter(ContentFormat... allowedContentFormats) {
         this.allowedContentFormat = allowedContentFormats;
     }
 

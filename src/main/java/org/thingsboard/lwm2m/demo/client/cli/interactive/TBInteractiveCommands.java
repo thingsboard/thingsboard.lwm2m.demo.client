@@ -31,7 +31,6 @@ import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.demo.cli.converters.LwM2mPathConverter;
 import org.eclipse.leshan.core.demo.cli.converters.StringLwM2mPathConverter;
 import org.eclipse.leshan.core.demo.cli.converters.VersionConverter;
-import org.eclipse.leshan.core.demo.cli.interactive.JLineInteractiveCommands;
 import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
@@ -41,16 +40,16 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendResponse;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.RebootCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.RebootCommand;
 import org.thingsboard.lwm2m.demo.client.objects.MyDevice;
 import org.thingsboard.lwm2m.demo.client.objects.MyLocation;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CollectCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.CreateCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.DeleteCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.ListCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.MoveCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.SendCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.InteractiveCommands.UpdateRegistrationCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.CollectCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.CreateCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.DeleteCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.ListCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.MoveCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.SendCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.UpdateRegistrationCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Model.CommandSpec;
@@ -72,7 +71,7 @@ import java.util.Map;
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
                  UpdateRegistrationCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
         // TODO "update"
-        // InteractiveCommands.UpdateResourceValues.class },
+        // TBInteractiveCommands.UpdateResourceValues.class },
         // Readme: | `update`                                           | Update value of Resource and `send current-value`.  Note: Resource must be `RW`
         // Example: update /5/0/1=pathForUrl /3/0/14=setUtcOffset((String)
 
@@ -80,12 +79,12 @@ import java.util.Map;
          synopsisHeading = "")
 
 @Slf4j
-public class InteractiveCommands extends JLineInteractiveCommands implements Runnable {
+public class TBInteractiveCommands extends TBJLineInteractiveCommands implements Runnable {
 
     private final LeshanClient client;
     private final LwM2mModelRepository repository;
 
-    public InteractiveCommands(LeshanClient client, LwM2mModelRepository repository) {
+    public TBInteractiveCommands(LeshanClient client, LwM2mModelRepository repository) {
         this.client = client;
         this.repository = repository;
     }
@@ -110,7 +109,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         private Integer objectId;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -169,7 +168,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         private Version version;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -210,7 +209,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         private Integer objectId;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -231,7 +230,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     static class UpdateRegistrationCommand implements Runnable {
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -250,7 +249,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     static class RebootCommand implements Runnable {
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
         @Override
         public void run() {
             LwM2mObjectEnabler objectEnabler = parent.client.getObjectTree().getObjectEnabler(LwM2mId.DEVICE);
@@ -268,7 +267,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
      * A command to send data.
      */
     @Command(name = "send",
-             description = "Send data to server",
+             description = "Send data to server: 'send current-value' or 'send collected-value'",
              subcommands = { SendCurrentValue.class, SendCollectedValue.class },
              synopsisSubcommandLabel = "(current-value | collected-value)",
              headerHeading = "%n",
@@ -280,11 +279,11 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
                 description = { //
                         "Name (e.g. SENML_JSON) or code (e.g. 110) of Content Format used to send data.", //
                         "Default : ${DEFAULT-VALUE}" },
-                converter = SendContentFormatConverver.class)
+                converter = SendTBContentFormatConverver.class)
         ContentFormat contentFormat;
 
-        public static class SendContentFormatConverver extends ContentFormatConverter {
-            public SendContentFormatConverver() {
+        public static class SendTBContentFormatConverver extends TBContentFormatConverter {
+            public SendTBContentFormatConverver() {
                 super(ContentFormat.SENML_CBOR, ContentFormat.SENML_JSON);
             }
         }
@@ -295,7 +294,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         CommandSpec spec;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -377,7 +376,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         private List<LwM2mPath> paths;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -397,7 +396,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
     static class MoveCommand implements Runnable {
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Option(names = { "-d", "north" }, description = "Move to the North")
         boolean north;
@@ -441,7 +440,7 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
         private List<String> resourceUpdates;
 
         @ParentCommand
-        InteractiveCommands parent;
+        TBInteractiveCommands parent;
 
         @Override
         public void run() {

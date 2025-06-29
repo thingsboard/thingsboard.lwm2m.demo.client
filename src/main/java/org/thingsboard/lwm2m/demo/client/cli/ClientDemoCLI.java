@@ -212,6 +212,15 @@ public class ClientDemoCLI implements Runnable {
                         "-tota", //
                 })
         public boolean testOta;
+
+        @Option(names = { "-ic", "--interactive-console" },
+                description = { //
+                        "ADesigned to execute dynamic commands from the interactive console.", //
+                        "TAfter launching, look at the \"help\" commands.", //
+                        "Syntax example:", //
+                        "-ic", //
+                })
+        public boolean interactiveConsole;
     }
 
     /* ********************************** Location Section ******************************** */
