@@ -29,12 +29,15 @@ import picocli.CommandLine.UnmatchedArgumentException;
 
 import java.io.PrintWriter;
 
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyLevelCLI_debug;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyLevelCLI;
+
 /**
  * A Message Handler which display usage of erroneous option only, unlike the default one which display the global help
  * usage.
  *
  */
-public class ShortErrorMessageHandler implements IParameterExceptionHandler {
+public class TBShortErrorMessageHandler implements IParameterExceptionHandler {
     @Override
     public int handleParseException(ParameterException ex, String[] args) {
         CommandLine cmd = ex.getCommandLine();
@@ -43,7 +46,7 @@ public class ShortErrorMessageHandler implements IParameterExceptionHandler {
         // print Error
         writer.println(cmd.getColorScheme().errorText(ex.getMessage()));
         writer.println();
-        if ("DEBUG".equalsIgnoreCase(System.getProperty("leshan.cli"))) {
+        if (propertyLevelCLI_debug.equalsIgnoreCase(System.getProperty(propertyLevelCLI))) {
             writer.println(cmd.getColorScheme().stackTraceText(ex));
         }
 

@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Command line Section about DTLS Identity (PSK, RPK or X509).
  */
-public class IdentitySection {
+public class TBSectionsCliDtlsIdentity {
 
     @ArgGroup(exclusive = false,
               heading = "%n@|bold,underline PSK Options|@ %n%n"//

@@ -19,8 +19,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCLI;
-import org.thingsboard.lwm2m.demo.client.core.ClientFactory;
-import org.thingsboard.lwm2m.demo.client.service.LwM2mClientService;
+import org.thingsboard.lwm2m.demo.client.core.LwM2MClient;
+import org.thingsboard.lwm2m.demo.client.service.LwM2MClientService;
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import picocli.CommandLine;
@@ -28,45 +28,40 @@ import picocli.CommandLine;
 import java.io.PrintWriter;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.createModel;
-import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI;
-import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI_false;
-import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyIsCLI_true;
 
 @Component
-public class CommandLineRunnerImpl implements CommandLineRunner {
+public class TBDemoCliRunnerImpl implements CommandLineRunner {
 
-    private final ClientFactory clientFactory;
-    private final LwM2mClientService clientService;
+    private final LwM2MClient lwM2MClient;
+    private final LwM2MClientService lwM2MClientService;
 
-    public CommandLineRunnerImpl(ClientFactory clientFactory, LwM2mClientService clientService) {
-        this.clientFactory = clientFactory;
-        this.clientService = clientService;
+    public TBDemoCliRunnerImpl(LwM2MClient lwM2MClient, LwM2MClientService lwM2MClientService) {
+        this.lwM2MClient = lwM2MClient;
+        this.lwM2MClientService = lwM2MClientService;
     }
 
     @Override
     public void run(String... args) {
-        ClientDemoCLI cli = new ClientDemoCLI();
-        CommandLine command = new CommandLine(cli).setParameterExceptionHandler(new ShortErrorMessageHandler());
+        TBSectionsCliMain cli = new TBSectionsCliMain();
+        CommandLine command = new CommandLine(cli).setParameterExceptionHandler(new TBShortErrorMessageHandler());
         int exitCode = command.execute(args);
         if (exitCode != 0 || command.isUsageHelpRequested() || command.isVersionHelpRequested()) {
             System.exit(exitCode);
         }
         try {
             LwM2mModelRepository repository = createModel(cli);
-            LeshanClient client = clientFactory.create(cli, repository);
+            LeshanClient client = lwM2MClient.create(cli, repository);
             if (cli.main.interactiveConsole) {
                 // Print commands help
-                TBInteractiveCLI interactiveCLI = new TBInteractiveCLI(new TBInteractiveCommands(client, repository));
-                interactiveCLI.showHelp();
+                TBInteractiveCLI tbInteractiveCLI = new TBInteractiveCLI(new TBInteractiveCommands(client, repository), cli);
+//                tbInteractiveCLI.showHelp();
                 // Start the client
-                clientService.start(client);
+                lwM2MClientService.start(client);
                 // Start interactive console
-                System.setProperty(propertyIsCLI, propertyIsCLI_true);
-                interactiveCLI.start();
+                tbInteractiveCLI.run();
             } else {
                 // Start the client without Interactive console
-                System.setProperty(propertyIsCLI, propertyIsCLI_false);
-                clientService.start(client);
+                lwM2MClientService.start(client);
             }
         } catch (Exception e) {
             PrintWriter printer = command.getErr();

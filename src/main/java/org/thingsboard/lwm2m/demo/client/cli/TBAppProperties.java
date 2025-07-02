@@ -21,7 +21,7 @@ import java.util.Properties;
 
 
 
-public class AppProperties {
+public class TBAppProperties {
     public static final String APP_VERSION = "app.version";
     public static final String APP_NAME = "app.name";
     public static final String TIMESTAMP = "app.timestamp";

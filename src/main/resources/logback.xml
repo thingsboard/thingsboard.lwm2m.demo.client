@@ -2,7 +2,7 @@
 <!DOCTYPE configuration>
 <configuration scan="true" scanPeriod="10 seconds">
 
-    <appender name="CLI" class="org.thingsboard.lwm2m.demo.client.logging.ConsoleAppenderCLI">
+    <appender name="CLI" class="org.thingsboard.lwm2m.demo.client.logging.TBConsoleAppenderCLI">
         <encoder>
             <pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>

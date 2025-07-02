@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ShutdownHandler {
 
-    private final LwM2mClientService clientService;
+    private final LwM2MClientService clientService;
 
-    public ShutdownHandler(LwM2mClientService clientService) {
+    public ShutdownHandler(LwM2MClientService clientService) {
         this.clientService = clientService;
     }
 

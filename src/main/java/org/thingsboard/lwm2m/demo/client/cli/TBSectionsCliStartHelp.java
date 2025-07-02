@@ -20,11 +20,13 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Option;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyLevelCLI;
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyLevelCLI_debug;
 
 /**
  * Mixing about stand helps Options.
  */
-public class StandardHelpOptions {
+public class TBSectionsCliStartHelp {
 
     @Option(names = { "-h", "--help" }, description = "Display help information.", usageHelp = true)
     private boolean help;
@@ -44,9 +46,9 @@ public class StandardHelpOptions {
     public void setVerbose(boolean[] verbose) {
         verboseLevel = verbose.length;
 
-        // set CLI verbosity. (See ShortErrorMessageHandler)
+        // set CLI verbosity. (See TBShortErrorMessageHandler)
         if (verbose.length > 0) {
-            System.setProperty("leshan.cli", "DEBUG");
+            System.setProperty(propertyLevelCLI, propertyLevelCLI_debug);
         }
 
         // change application log level.

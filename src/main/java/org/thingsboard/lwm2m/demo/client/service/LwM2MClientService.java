@@ -19,7 +19,7 @@ import org.eclipse.leshan.client.LeshanClient;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LwM2mClientService {
+public class LwM2MClientService {
 
     private LeshanClient client;
 

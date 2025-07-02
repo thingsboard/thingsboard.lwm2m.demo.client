@@ -53,12 +53,12 @@ import java.util.stream.Stream;
                  + "@|italic " //
                  + "This is Thingsboard Lwm2m Demo Client implemented with Leshan library.%n" //
                  + "You can launch it without any option and it will try to register to a LWM2M server at " + "coap://"
-                 + ClientDemoCLI.DEFAULT_COAP_URL + ".%n" //
+                 + TBSectionsCliMain.DEFAULT_COAP_URL + ".%n" //
                  + "%n" //
                  + "Californium is used as CoAP library and some CoAP parameters can be tweaked in 'Californium.properties' file." //
                  + "|@%n%n",
          versionProvider = VersionProvider.class)
-public class ClientDemoCLI implements Runnable {
+public class TBSectionsCliMain implements Runnable {
 
 //    public static final String DEFAULT_COAP_URL = "localhost:" + CoAP.DEFAULT_COAP_PORT;
     public static final String DEFAULT_COAP_URL = "localhost:" + 5685;
@@ -74,7 +74,7 @@ public class ClientDemoCLI implements Runnable {
     }
 
     @Mixin
-    public StandardHelpOptions helpsOptions;
+    public TBSectionsCliStartHelp helpsOptions;
 
     /* ********************************** General Section ******************************** */
     @ArgGroup(validate = false, heading = "%n")
@@ -99,7 +99,7 @@ public class ClientDemoCLI implements Runnable {
                 description = { //
                         "Set the endpoint name of the Client.", //
                         "Default the hostname or 'ThingsboardLwm2mClientDemo' if no hostname." })
-        public String endpoint = ClientDemoCLI.defaultEndpoint();
+        public String endpoint = TBSectionsCliMain.defaultEndpoint();
 
         @Option(names = { "-l", "--lifetime" },
                 defaultValue = "300" /* 5 minutes */,
@@ -213,14 +213,25 @@ public class ClientDemoCLI implements Runnable {
                 })
         public boolean testOta;
 
-        @Option(names = { "-ic", "--interactive-console" },
+        @Option(names = { "-cli", "--command-line-interactive" },
                 description = { //
-                        "ADesigned to execute dynamic commands from the interactive console.", //
-                        "TAfter launching, look at the \"help\" commands.", //
+                        "Enables interactive command-line mode for executing dynamic commands.", //
+                        "After launching, look at the \"help\" commands.", //
                         "Syntax example:", //
-                        "-ic", //
+                        "-cli", //
                 })
         public boolean interactiveConsole;
+
+        // mandatory parameters
+        @Option(required = true,
+                names = { "-tcli", "--time-out-cli" },
+                description = { //
+                        "Timeout interval (in seconds) ", //
+                        "for flushing logs if no user input is received in CLI mode.", //
+                        "Syntax example:", //
+                        "-tcli", //
+                })
+        public Integer cliTimeoutSeconds = 5;
     }
 
     /* ********************************** Location Section ******************************** */
@@ -327,7 +338,7 @@ public class ClientDemoCLI implements Runnable {
 
     /* ********************************** Identity Section ******************************** */
     @ArgGroup(exclusive = true)
-    public IdentitySection identity = new IdentitySection();
+    public TBSectionsCliDtlsIdentity identity = new TBSectionsCliDtlsIdentity();
 
     /* ********************************** OSCORE Section ******************************** */
     @ArgGroup(exclusive = false,
@@ -337,7 +348,7 @@ public class ClientDemoCLI implements Runnable {
                       + "|@" + "@|red, OSCORE implementation in Leshan is in an experimental state.|@%n" //
                       + "%n")
 
-    public OscoreSection oscore;
+    public TBSectionsCliOscore oscore;
 
     @Spec
     CommandSpec spec;

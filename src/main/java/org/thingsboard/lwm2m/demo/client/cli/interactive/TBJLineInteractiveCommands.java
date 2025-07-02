@@ -51,7 +51,9 @@ public class TBJLineInteractiveCommands {
      * See {@link PrintWriter#printf(String, Object...)}
      */
     public PrintWriter printf(String format, Object... args) {
-        return out.printf(format, args);
+        String formatted = String.format(format, args); // %s, %d
+        String colored = CommandLine.Help.Ansi.ON.string(formatted); // обробляє @|...|@
+        return out.printf("%s", colored);
     }
 
     /**
@@ -62,7 +64,9 @@ public class TBJLineInteractiveCommands {
      * See {@link PrintWriter#printf(String, Object...)}
      */
     public PrintWriter printfAnsi(String format, Object... args) {
-        return out.printf(commandLine.getColorScheme().ansi().string(format), args);
+        String formatted = String.format(format, args); // %s, %d
+        String colored = CommandLine.Help.Ansi.ON.string(formatted); // обробляє @|...|@
+        return out.printf("%s", colored);
     }
 
     /**

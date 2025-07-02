@@ -53,12 +53,9 @@ import org.eclipse.leshan.core.response.BootstrapWriteResponse;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.coaptcp.endpoint.JavaCoapsTcpClientEndpointsProvider;
 import org.eclipse.leshan.transport.javacoap.client.endpoint.JavaCoapClientEndpointsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.thingsboard.lwm2m.demo.client.DtlsSessionLogger;
-import org.thingsboard.lwm2m.demo.client.ThingsboardLwDemoCient;
-import org.thingsboard.lwm2m.demo.client.cli.ClientDemoCLI;
+import org.thingsboard.lwm2m.demo.client.cli.TBSectionsCliMain;
 import org.thingsboard.lwm2m.demo.client.engine.DefaultClientEndpointNameProvider;
 import org.thingsboard.lwm2m.demo.client.objects.FwLwM2MDevice;
 import org.thingsboard.lwm2m.demo.client.objects.LwM2mBinaryAppDataContainer;
@@ -107,14 +104,13 @@ import static org.thingsboard.lwm2m.demo.client.util.Utils.CF_CONFIGURATION_FILE
 import static org.thingsboard.lwm2m.demo.client.util.Utils.CF_CONFIGURATION_HEADER;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.OBJECT_ID_LWM2M_TEST_OBJECT;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.OBJECT_ID_TEMPERATURE_SENSOR;
-import static org.thingsboard.lwm2m.demo.client.util.Utils.createModel;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.fromLength;
 
 @Slf4j
 @Component
-public class ClientFactory {
+public class LwM2MClient {
 
-    public LeshanClient create(ClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
+    public LeshanClient create(TBSectionsCliMain cli, LwM2mModelRepository repository) throws Exception {
                 // create Thingsboard Lwm2m Demo Client from command line option
         final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
                 cli.location.position.longitude, cli.location.scaleFactor);

@@ -26,7 +26,7 @@ import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.thingsboard.lwm2m.demo.client.cli.ClientDemoCLI;
+import org.thingsboard.lwm2m.demo.client.cli.TBSectionsCliMain;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 
@@ -67,7 +67,7 @@ public class Utils {
 
     public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
-    public static LwM2mModelRepository createModel(ClientDemoCLI cli) throws Exception {
+    public static LwM2mModelRepository createModel(TBSectionsCliMain cli) throws Exception {
 
         List<ObjectModel> models = ObjectLoader.loadAllDefault();
         models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
@@ -237,5 +237,9 @@ public class Utils {
             }
         }
         return !Files.exists(path);
+    }
+
+    public static void printReadLog(String nameClazz, int modelId, int instanceId, int resourceId, Object value) {
+        log.info("Read on {} resource /{}/{}/{} = {}", nameClazz, modelId, instanceId, resourceId, value);
     }
 }

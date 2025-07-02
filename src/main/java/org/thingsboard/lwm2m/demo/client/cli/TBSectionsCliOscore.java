@@ -34,7 +34,7 @@ import java.util.Arrays;
 /**
  * Command line Section about OSCORE credentials.
  */
-public class OscoreSection {
+public class TBSectionsCliOscore {
 
     // mandatory parameters
     @Option(required = true,

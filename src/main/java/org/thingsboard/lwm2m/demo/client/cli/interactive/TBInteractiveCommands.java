@@ -67,9 +67,15 @@ import java.util.Map;
  */
 @Command(name = "",
          description = "@|bold,underline Thingsboard Lwm2m Demo Client Interactive Console :|@%n",
-         footer = { "%n@|italic Press Ctl-C to exit.|@%n" },
+        footer = {
+                "- Press 'Ctrl-V' once to paste text.",
+                "- Press 'Ctrl-C' once to copy text.",
+                "- Press 'Ctrl-C' 'Ctrl-C' quickly to exit the demo client.",
+                "- Use the CLI command 'stop' to pause reading input from the console without exiting the application."
+        },
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
-                 UpdateRegistrationCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class, RebootCommand.class },
+                 UpdateRegistrationCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class,
+                 RebootCommand.class, TBInteractiveCommands.ExitCommand.class },
         // TODO "update"
         // TBInteractiveCommands.UpdateResourceValues.class },
         // Readme: | `update`                                           | Update value of Resource and `send current-value`.  Note: Resource must be `RW`
@@ -83,6 +89,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
 
     private final LeshanClient client;
     private final LwM2mModelRepository repository;
+    private boolean running;
 
     public TBInteractiveCommands(LeshanClient client, LwM2mModelRepository repository) {
         this.client = client;
@@ -92,6 +99,13 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     @Override
     public void run() {
         printUsageMessage();
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+    public boolean getRunning() {
+        return this.running ;
     }
 
     /**
@@ -427,6 +441,22 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
                         location.moveLocation("w");
                 }
             }
+        }
+    }
+
+    @Command(name = "stop",
+            description = "Stop the CLI",
+            headerHeading = "%n",
+            footer = "",
+            sortOptions = false)
+    static class ExitCommand implements Runnable {
+
+        @ParentCommand
+        TBInteractiveCommands parent;
+        @Override
+        public void run() {
+            System.out.println("Exiting...");
+            parent.setRunning(false);
         }
     }
 
