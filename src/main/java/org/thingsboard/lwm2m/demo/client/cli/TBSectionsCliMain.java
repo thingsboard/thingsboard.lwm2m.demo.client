@@ -26,6 +26,7 @@ import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.util.StringUtils;
 import org.thingsboard.lwm2m.demo.client.VersionProvider;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionsCliStartHelp;
 import org.thingsboard.lwm2m.demo.client.engine.DefaultClientEndpointNameProvider.Mode;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;

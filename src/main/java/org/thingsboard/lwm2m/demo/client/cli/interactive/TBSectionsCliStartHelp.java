@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.lwm2m.demo.client.cli;
+package org.thingsboard.lwm2m.demo.client.cli.interactive;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -30,9 +30,6 @@ public class TBSectionsCliStartHelp {
 
     @Option(names = { "-h", "--help" }, description = "Display help information.", usageHelp = true)
     private boolean help;
-
-    @Option(names = { "-V", "--version" }, description = "Print version information and exit.", versionHelp = true)
-    private boolean versionRequested;
 
     private int verboseLevel = 0;
 

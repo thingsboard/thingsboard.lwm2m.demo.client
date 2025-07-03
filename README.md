@@ -496,6 +496,7 @@ And in your logback config:
 | `updateRegistration`                               | Trigger a registration update.                                                                                                                                                                                      |
 | `reboot`                                           | Restart client without update object.                                                                                                                                                                               |
 | `stop`                                             | Stop the CLI.                                                                                                                                                                                                       |
+| `version`, `info`, `about`, `appInfo`              | Show application version and build information                                                                                                                                                                      |
 
 **Note:** 
 - Press **'Ctrl-V'** once to paste text.

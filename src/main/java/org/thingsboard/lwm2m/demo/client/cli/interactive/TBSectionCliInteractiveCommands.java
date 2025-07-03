@@ -40,27 +40,30 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendResponse;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.RebootCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.RebootCommand;
 import org.thingsboard.lwm2m.demo.client.objects.MyDevice;
 import org.thingsboard.lwm2m.demo.client.objects.MyLocation;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.CollectCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.CreateCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.DeleteCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.ListCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.MoveCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.SendCommand;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands.UpdateRegistrationCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.CollectCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.CreateCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.DeleteCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.ListCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.MoveCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.SendCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.UpdateRegistrationCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.ExitCommand;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands.VersionCommand;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
-
+import picocli.CommandLine.HelpCommand;
 import java.util.List;
 import java.util.Map;
+
+import static org.thingsboard.lwm2m.demo.client.util.UtilsCLI.propertyLevelCLI_name;
 
 /**
  * Interactive commands for the Thingsboard Lwm2m Demo Client
@@ -75,25 +78,28 @@ import java.util.Map;
         },
          subcommands = { HelpCommand.class, ListCommand.class, CreateCommand.class, DeleteCommand.class,
                  UpdateRegistrationCommand.class, SendCommand.class, CollectCommand.class, MoveCommand.class,
-                 RebootCommand.class, TBInteractiveCommands.ExitCommand.class },
+                 RebootCommand.class, ExitCommand.class, VersionCommand.class },
         // TODO "update"
-        // TBInteractiveCommands.UpdateResourceValues.class },
+        // TBSectionCliInteractiveCommands.UpdateResourceValues.class },
         // Readme: | `update`                                           | Update value of Resource and `send current-value`.  Note: Resource must be `RW`
         // Example: update /5/0/1=pathForUrl /3/0/14=setUtcOffset((String)
 
          customSynopsis = { "" },
-         synopsisHeading = "")
+         synopsisHeading = ""
+)
 
 @Slf4j
-public class TBInteractiveCommands extends TBJLineInteractiveCommands implements Runnable {
+public class TBSectionCliInteractiveCommands extends TBJLineInteractiveCommands implements Runnable {
 
     private final LeshanClient client;
     private final LwM2mModelRepository repository;
+    private final TBAppVersionProviderCli TBAppVersionProviderCli;
     private boolean running;
 
-    public TBInteractiveCommands(LeshanClient client, LwM2mModelRepository repository) {
+    public TBSectionCliInteractiveCommands(LeshanClient client, LwM2mModelRepository repository, TBAppVersionProviderCli TBAppVersionProviderCli) {
         this.client = client;
         this.repository = repository;
+        this.TBAppVersionProviderCli = TBAppVersionProviderCli;
     }
 
     @Override
@@ -106,6 +112,11 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     }
     public boolean getRunning() {
         return this.running ;
+    }
+
+    public String[] getAppVersion() {
+        // повернути версію, наприклад, звертаючись до TBAppVersionProviderCli
+        return this.TBAppVersionProviderCli.getVersion();
     }
 
     /**
@@ -123,7 +134,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         private Integer objectId;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -182,7 +193,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         private Version version;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -223,7 +234,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         private Integer objectId;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -244,7 +255,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     static class UpdateRegistrationCommand implements Runnable {
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -263,7 +274,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     static class RebootCommand implements Runnable {
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
         @Override
         public void run() {
             LwM2mObjectEnabler objectEnabler = parent.client.getObjectTree().getObjectEnabler(LwM2mId.DEVICE);
@@ -308,7 +319,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         CommandSpec spec;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -390,7 +401,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         private List<LwM2mPath> paths;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {
@@ -410,7 +421,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     static class MoveCommand implements Runnable {
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Option(names = { "-d", "north" }, description = "Move to the North")
         boolean north;
@@ -452,11 +463,38 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
     static class ExitCommand implements Runnable {
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
         @Override
         public void run() {
             System.out.println("Exiting...");
             parent.setRunning(false);
+        }
+    }
+
+    @Command(
+            name = "version",
+            aliases = { "info", "about", "appInfo" },
+            description = "Show application version and build information")
+    static class VersionCommand implements Runnable {
+
+        @ParentCommand
+        TBSectionCliInteractiveCommands parent;
+
+        @Override
+        public void run() {
+            String[] versions = parent.getAppVersion();
+            parent.printfAnsi("@|bold,fg(yellow) Application Information : |@%n");
+            for (String line : versions) {
+                String[] l = line.split(" ");
+                if (propertyLevelCLI_name.equals(l[0])){
+                    parent.printfAnsi("@|bold,fg(magenta) -%s \t\t: |@ @|bold,fg(green) %s |@ %n", l[0], l[1]);
+                } else {
+                    parent.printfAnsi("@|bold,fg(magenta) -%s \t: |@ @|bold,fg(green) %s |@ %n", l[0], l[1]);
+                }
+
+            }
+            parent.flush();
+
         }
     }
 
@@ -470,7 +508,7 @@ public class TBInteractiveCommands extends TBJLineInteractiveCommands implements
         private List<String> resourceUpdates;
 
         @ParentCommand
-        TBInteractiveCommands parent;
+        TBSectionCliInteractiveCommands parent;
 
         @Override
         public void run() {

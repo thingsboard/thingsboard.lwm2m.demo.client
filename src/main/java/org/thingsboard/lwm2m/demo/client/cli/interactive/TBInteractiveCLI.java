@@ -41,13 +41,14 @@ public class TBInteractiveCLI {
     private final LineReader reader;
     private final TBSectionsCliMain cli;
     private final Appender<ILoggingEvent> appenderCLI;
-    private final TBInteractiveCommands interactiveCommands;
+    private final TBSectionCliInteractiveCommands interactiveCommands;
 
 
-    public TBInteractiveCLI(TBInteractiveCommands interactiveCommands, TBSectionsCliMain cli) throws IOException {
+    public TBInteractiveCLI(TBSectionCliInteractiveCommands interactiveCommands, TBSectionsCliMain cli) throws IOException {
         // Set up CLI with completion
         this.interactiveCommands = interactiveCommands;
         this.commandLine = new CommandLine(this.interactiveCommands);
+
         this.cli = cli;
         Completer completer = new picocli.shell.jline3.PicocliJLineCompleter(commandLine.getCommandSpec());
         this.reader = LineReaderBuilder.builder()

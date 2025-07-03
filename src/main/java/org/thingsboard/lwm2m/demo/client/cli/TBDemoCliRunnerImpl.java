@@ -15,9 +15,11 @@
  */
 package org.thingsboard.lwm2m.demo.client.cli;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCommands;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBAppVersionProviderCli;
+import org.thingsboard.lwm2m.demo.client.cli.interactive.TBSectionCliInteractiveCommands;
 import org.thingsboard.lwm2m.demo.client.cli.interactive.TBInteractiveCLI;
 import org.thingsboard.lwm2m.demo.client.core.LwM2MClient;
 import org.thingsboard.lwm2m.demo.client.service.LwM2MClientService;
@@ -34,6 +36,9 @@ public class TBDemoCliRunnerImpl implements CommandLineRunner {
 
     private final LwM2MClient lwM2MClient;
     private final LwM2MClientService lwM2MClientService;
+
+    @Autowired
+    TBAppVersionProviderCli TBAppVersionProviderCli;
 
     public TBDemoCliRunnerImpl(LwM2MClient lwM2MClient, LwM2MClientService lwM2MClientService) {
         this.lwM2MClient = lwM2MClient;
@@ -53,8 +58,7 @@ public class TBDemoCliRunnerImpl implements CommandLineRunner {
             LeshanClient client = lwM2MClient.create(cli, repository);
             if (cli.main.interactiveConsole) {
                 // Print commands help
-                TBInteractiveCLI tbInteractiveCLI = new TBInteractiveCLI(new TBInteractiveCommands(client, repository), cli);
-//                tbInteractiveCLI.showHelp();
+                TBInteractiveCLI tbInteractiveCLI = new TBInteractiveCLI(new TBSectionCliInteractiveCommands(client, repository, TBAppVersionProviderCli), cli);
                 // Start the client
                 lwM2MClientService.start(client);
                 // Start interactive console

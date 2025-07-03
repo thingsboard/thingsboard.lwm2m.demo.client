@@ -25,6 +25,7 @@ public class UtilsCLI {
 
     public static final String propertyLevelCLI = "tb.cli.level";
     public static final String propertyLevelCLI_debug = "DEBUG";
+    public static final String propertyLevelCLI_name = "Name";
 
     public static Terminal getTerminalCLI() {
         try {

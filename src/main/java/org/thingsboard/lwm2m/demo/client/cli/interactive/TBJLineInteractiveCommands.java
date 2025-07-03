@@ -65,7 +65,7 @@ public class TBJLineInteractiveCommands {
      */
     public PrintWriter printfAnsi(String format, Object... args) {
         String formatted = String.format(format, args); // %s, %d
-        String colored = CommandLine.Help.Ansi.ON.string(formatted); // обробляє @|...|@
+        String colored = CommandLine.Help.Ansi.ON.string(formatted); // action @|...|@
         return out.printf("%s", colored);
     }
 
