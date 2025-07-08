@@ -214,6 +214,15 @@ public class TBSectionsCliMain implements Runnable {
                 })
         public boolean testOta;
 
+        @Option(names = { "-tFreq", "--timeDataFrequency" },
+                description = { //
+                        "This option specifies the reporting interval (in seconds) for the Observe resource functionality on the object when invoking the fireResourceChange method. Default value: 5 seconds.", //
+                        "syntax is :", //
+                        "-tFreq 60", //
+                        "-tFreq 10", //
+                })
+        public Integer timeDataFrequency = 5;
+
         @Option(names = { "-cli", "--command-line-interactive" },
                 description = { //
                         "Enables interactive command-line mode for executing dynamic commands.", //

@@ -15,6 +15,7 @@
  */
 package org.thingsboard.lwm2m.demo.client.objects;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
@@ -25,6 +26,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static org.thingsboard.lwm2m.demo.client.util.Utils.printReadLog;
 
 @Slf4j
 public class MyLocation extends BaseInstanceEnabler {
@@ -35,13 +40,15 @@ public class MyLocation extends BaseInstanceEnabler {
     private float latitude;
     private float longitude;
     private final float scaleFactor;
+    @Getter
     private Date timestamp;
+    private final Timer timer;
 
     public MyLocation() {
-        this(null, null, 1.0f);
+        this(5, null, null, 1.0f);
     }
 
-    public MyLocation(Float latitude, Float longitude, float scaleFactor) {
+    public MyLocation(Integer timeDataFrequency, Float latitude, Float longitude, float scaleFactor) {
         if (latitude != null) {
             this.latitude = latitude + 90f;
         } else {
@@ -53,21 +60,36 @@ public class MyLocation extends BaseInstanceEnabler {
             this.longitude = RANDOM.nextInt(360);
         }
         this.scaleFactor = scaleFactor;
-        timestamp = new Date();
+        this.timestamp = new Date();
+        this.timer = new Timer("Id = [3] Device -> schedule Time period = [" + timeDataFrequency + "] sec");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(0);
+                fireResourceChange(1);
+                fireResourceChange(5);
+            }
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
     @Override
-    public ReadResponse read(LwM2mServer server, int resourceid) {
-        log.info("Read on Location resource /{}/{}/{}", getModel().id, getId(), resourceid);
-        switch (resourceid) {
+    public ReadResponse read(LwM2mServer server, int resourceId) {
+        Object value;
+        switch (resourceId) {
         case 0:
-            return ReadResponse.success(resourceid, getLatitude());
+            value = getLatitude();
+            printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+            return ReadResponse.success(resourceId, (float) value);
         case 1:
-            return ReadResponse.success(resourceid, getLongitude());
+            value = getLongitude();
+            printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+            return ReadResponse.success(resourceId, (float) value);
         case 5:
-            return ReadResponse.success(resourceid, getTimestamp());
+            value = getTimestamp();
+            printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+            return ReadResponse.success(resourceId, (Date) value);
         default:
-            return super.read(server, resourceid);
+            return super.read(server, resourceId);
         }
     }
 
@@ -93,27 +115,23 @@ public class MyLocation extends BaseInstanceEnabler {
     }
 
     private void moveLatitude(float delta) {
-        latitude = latitude + delta * scaleFactor;
-        timestamp = new Date();
+        this.latitude = this.latitude + delta * this.scaleFactor;
+        this.timestamp = new Date();
         fireResourcesChange(getResourcePath(0), getResourcePath(5));
     }
 
     private void moveLongitude(float delta) {
-        longitude = longitude + delta * scaleFactor;
-        timestamp = new Date();
+        this.longitude = this.longitude + delta * this.scaleFactor;
+        this.timestamp = new Date();
         fireResourcesChange(getResourcePath(1), getResourcePath(5));
     }
 
     public float getLatitude() {
-        return latitude - 90.0f;
+        return this.latitude - 90.0f;
     }
 
     public float getLongitude() {
-        return longitude - 180.f;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
+        return this.longitude - 180.f;
     }
 
     @Override

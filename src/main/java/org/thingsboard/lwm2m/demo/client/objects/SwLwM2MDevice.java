@@ -83,28 +83,36 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     private String packageVersion = PACKAGE_VERSION_DEF;
 
     public SwLwM2MDevice() {
+        this(5);
+    }
+
+    public SwLwM2MDevice(Integer timeDataFrequency) {
         this.initOtaSw();
-        this.timer = new Timer("9 - Device-Current Time");
+        this.timer = new Timer("Id = [9] LWM2M Software Management -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                fireResourceChange(7);
+                fireResourceChange(1);
+                fireResourceChange(7);
+                fireResourceChange(9);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
-    public SwLwM2MDevice(boolean testObject, boolean testOta) {
+    public SwLwM2MDevice(Integer timeDataFrequency, boolean testObject, boolean testOta) {
         this.testObject = testObject;
         this.testOta = testOta;
         this.initOtaSw();
         // notify new date each 5 second
-        this.timer = new Timer("9 - Device-Current Time");
+        this.timer = new Timer("Id = [9] LWM2M Software Management -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                fireResourceChange(7);
+                fireResourceChange(1);
+                fireResourceChange(7);
+                fireResourceChange(9);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
 
@@ -117,20 +125,27 @@ public class SwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     @Override
-    public ReadResponse read(LwM2mServer identity, int resourceId) {
-        if (!identity.isSystem())
-            log.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+    public ReadResponse read(LwM2mServer server, int resourceId) {
+        Object value;
         switch (resourceId) {
             case 0:
-                return ReadResponse.success(resourceId, getPkgName());
+                value = getPkgName();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (String) value);
             case 1:
-                return ReadResponse.success(resourceId, getPkgVersion());
+                value = getPkgVersion();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (String) value);
             case 7:
-                return ReadResponse.success(resourceId, getState());
+                value = getState();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (int) value);
             case 9:
-                return ReadResponse.success(resourceId, getUpdateResult());
+                value = getUpdateResult();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (int) value);
             default:
-                return super.read(identity, resourceId);
+                return super.read(server, resourceId);
         }
     }
 

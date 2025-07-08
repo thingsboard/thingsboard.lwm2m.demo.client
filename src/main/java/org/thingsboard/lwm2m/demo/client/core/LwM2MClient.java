@@ -112,9 +112,6 @@ public class LwM2MClient {
 
     public LeshanClient create(TBSectionsCliMain cli, LwM2mModelRepository repository) throws Exception {
                 // create Thingsboard Lwm2m Demo Client from command line option
-        final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
-                cli.location.position.longitude, cli.location.scaleFactor);
-
         // Initialize object list
         final ObjectsInitializer initializer = new ObjectsInitializer(repository.getLwM2mModel());
         // handle OSCORE
@@ -193,14 +190,15 @@ public class LwM2MClient {
             throw new IllegalStateException("Only one of these parameters (`-tobj` or `-tota`) can be used at a time.");
         }
         Utils.setOtaFolder(cli.main.otaFolder);
-        initializer.setInstancesForObject(DEVICE, new MyDevice());
-        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.testObject, cli.main.testOta));
+        initializer.setInstancesForObject(DEVICE, new MyDevice(cli.main.timeDataFrequency));
+        initializer.setInstancesForObject(FIRMWARE, new FwLwM2MDevice(cli.main.timeDataFrequency, cli.main.testObject, cli.main.testOta));
 
-        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.testObject, cli.main.testOta));
-        initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(0),
-                new LwM2mBinaryAppDataContainer(1));
-        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
+        initializer.setInstancesForObject(SOFTWARE_MANAGEMENT, new SwLwM2MDevice(cli.main.timeDataFrequency, cli.main.testObject, cli.main.testOta));
+        initializer.setInstancesForObject(LOCATION, new MyLocation(cli.main.timeDataFrequency, cli.location.position.latitude,
+                cli.location.position.longitude, cli.location.scaleFactor));
+        initializer.setInstancesForObject(BINARY_APP_DATA_CONTAINER, new LwM2mBinaryAppDataContainer(cli.main.timeDataFrequency, 0),
+                new LwM2mBinaryAppDataContainer(cli.main.timeDataFrequency, 1));
+        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor(cli.main.timeDataFrequency));
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
 
         List<LwM2mObjectEnabler> enablers = initializer.createAll();

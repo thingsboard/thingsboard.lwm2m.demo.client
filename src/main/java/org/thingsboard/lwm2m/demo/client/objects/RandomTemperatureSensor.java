@@ -54,14 +54,17 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     private double maxMeasuredValue = currentTemp;
 
     public RandomTemperatureSensor() {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
-        scheduler.scheduleAtFixedRate(new Runnable() {
+        this(5);
+    }
 
+    public RandomTemperatureSensor(Integer timeDataFrequency) {
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Id = 3303 - TemperatureSensor -> schedule Time period = [" + timeDataFrequency + "] sec"));
+        scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 adjustTemperature();
             }
-        }, 30, 30, TimeUnit.SECONDS);
+        }, timeDataFrequency, timeDataFrequency, TimeUnit.SECONDS);
     }
 
     @Override
@@ -70,21 +73,21 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
         return switch (resourceId) {
             case MIN_MEASURED_VALUE -> {
                 value = getTwoDigitValue(minMeasuredValue);
-                printReadLog(getModel().name, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 yield ReadResponse.success(resourceId, (double)value);
             }
             case MAX_MEASURED_VALUE -> {
                 value = getTwoDigitValue(maxMeasuredValue);
-                printReadLog(getModel().name, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 yield ReadResponse.success(resourceId, (double)value);
             }
             case SENSOR_VALUE -> {
                 value = getTwoDigitValue(currentTemp);
-                printReadLog(getModel().name, getModel().id, getId(), resourceId, getTwoDigitValue(currentTemp));
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, getTwoDigitValue(currentTemp));
                 yield ReadResponse.success(resourceId, (double)value);
             }
             case UNITS -> {
-                printReadLog(getModel().name, getModel().id, getId(), resourceId, UNIT_CELSIUS);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, UNIT_CELSIUS);
                 yield ReadResponse.success(resourceId, UNIT_CELSIUS);
             }
             default -> super.read(server, resourceId);

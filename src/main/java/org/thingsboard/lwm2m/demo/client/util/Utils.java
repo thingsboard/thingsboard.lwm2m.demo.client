@@ -15,12 +15,14 @@
  */
 package org.thingsboard.lwm2m.demo.client.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.scandium.dtls.MaxFragmentLengthExtension.Length;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
 import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import org.eclipse.leshan.core.model.ObjectLoader;
@@ -39,6 +41,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -239,7 +242,19 @@ public class Utils {
         return !Files.exists(path);
     }
 
-    public static void printReadLog(String nameClazz, int modelId, int instanceId, int resourceId, Object value) {
-        log.info("Read on {} resource /{}/{}/{} = {}", nameClazz, modelId, instanceId, resourceId, value);
+    public static void printReadLog(LwM2mServer server, String nameClazz, int modelId, int instanceId, int resourceId, Object value) {
+        if (!server.isSystem()) {
+            log.info("Read on {} resource /{}/{}/{} = {}", nameClazz, modelId, instanceId, resourceId, value);
+        }
+    }
+
+    public static String printMap (Map<Integer, ?> map) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(
+                    String.format("Failed to serialize map: %s | Error: %s", map, e.getMessage()), e
+            );
+        }
     }
 }

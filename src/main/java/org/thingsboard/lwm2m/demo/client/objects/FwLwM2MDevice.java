@@ -39,6 +39,7 @@ import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
 import org.thingsboard.lwm2m.demo.client.entities.OtaPackageType;
 import org.thingsboard.lwm2m.demo.client.util.FirmwareUpdateResult;
 import org.thingsboard.lwm2m.demo.client.util.FirmwareUpdateState;
+import org.thingsboard.lwm2m.demo.client.util.Utils;
 
 import javax.security.auth.Destroyable;
 import java.io.FileOutputStream;
@@ -79,30 +80,37 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
     public FwLwM2MDevice() {
         // notify new date each 5 second
+        this(5);
+    }
+
+    public FwLwM2MDevice(Integer timeDataFrequency) {
+        // notify new date each 5 second
         this.initOtaFw();
-        this.timer = new Timer("5 - Device-Current Time");
+        this.timer = new Timer("Id = [5] Firmware Update -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                fireResourceChange(1);
-//                fireResourceChange(9);
+                fireResourceChange(1);
+                fireResourceChange(3);
+                fireResourceChange(5);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
-    public FwLwM2MDevice(boolean testObject, boolean testOta) {
+    public FwLwM2MDevice(Integer timeDataFrequency, boolean testObject, boolean testOta) {
         this.testObject = testObject;
         this.testOta = testOta;
         this.initOtaFw();
         // notify new date each 5 second
-        this.timer = new Timer("5 - Device-Current Time");
+        this.timer = new Timer("Id = [5] Firmware Update -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                fireResourceChange(1);
-//                fireResourceChange(9);
+                fireResourceChange(1);
+                fireResourceChange(3);
+                fireResourceChange(5);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
     private void initOtaFw(){
@@ -115,25 +123,37 @@ public class FwLwM2MDevice extends BaseInstanceEnabler implements Destroyable {
 
 
     @Override
-    public ReadResponse read(LwM2mServer identity, int resourceId) {
-        if (!identity.isSystem())
-            log.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
+    public ReadResponse read(LwM2mServer server, int resourceId) {
+        Object value;
         switch (resourceId) {
             case 1:
-                return ReadResponse.success(resourceId, getPackageURI());
+                value = getPackageURI();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (String) value);
             case 3:
-                return ReadResponse.success(resourceId, getState());
+                value = getState();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (int) value);
             case 5:
-                return ReadResponse.success(resourceId, getUpdateResult());
+                value = getUpdateResult();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (int) value);
             case 6:
-                return ReadResponse.success(resourceId, getPkgName());
+                value = getPkgName();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (String) value);
             case 7:
-                return ReadResponse.success(resourceId, getPkgVersion());
+                value = getPkgVersion();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (String) value);
             case 9:
-                return ReadResponse.success(resourceId, getFirmwareUpdateDeliveryMethod());
+                value = getFirmwareUpdateDeliveryMethod();
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                return ReadResponse.success(resourceId, (int) value);
             default:
-                return super.read(identity, resourceId);
+                return super.read(server, resourceId);
         }
+
     }
 
     @Override

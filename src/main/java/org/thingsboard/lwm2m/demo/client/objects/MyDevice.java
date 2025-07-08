@@ -28,9 +28,8 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.thingsboard.lwm2m.demo.client.entities.LwM2MClientOtaInfo;
+import org.thingsboard.lwm2m.demo.client.util.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -46,6 +45,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static org.thingsboard.lwm2m.demo.client.util.Utils.getPathInfoOtaFw;
+import static org.thingsboard.lwm2m.demo.client.util.Utils.printReadLog;
 import static org.thingsboard.lwm2m.demo.client.util.Utils.readOtaInfoFromFile;
 
 @Slf4j
@@ -59,16 +59,20 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     private String firmwareVersion;
 
     public MyDevice() {
+        this(5);
+    }
+
+    public MyDevice(Integer timeDataFrequency) {
         this.initOtaFw();
-        // notify new date each 5 second
-        this.timer = new Timer("Device-Current Time");
+        // notify new date each 5 second Default
+        this.timer = new Timer("Id = [3] Device -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 fireResourceChange(13);
                 fireResourceChange(9);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
     private void initOtaFw() {
@@ -81,72 +85,71 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public ReadResponse read(LwM2mServer server, int resourceId) {
         Object value;
-
         switch (resourceId) {
             case 0:
                 value = getManufacturer();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 1:
                 value = getModelNumber();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 2:
                 value = getSerialNumber();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 3:
                 value = getFirmwareVersion();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 9:
                 value = getBatteryLevel();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (int) value);
             case 10:
                 value = getMemoryFree();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (long) value);
             case 11:
                 Map<Integer, Long> errorCodes = new HashMap<>();
                 errorCodes.put(0, getErrorCode());
-                printReadLog(server, getModel().id, getId(), resourceId, errorCodes);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, errorCodes);
                 return ReadResponse.success(resourceId, errorCodes, Type.INTEGER);
             case 13:
                 value = getCurrentTime();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (Date) value);
             case 14:
                 value = getUtcOffset();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 15:
                 value = getTimezone();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 16:
                 value = getSupportedBinding();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 17:
                 value = getDeviceType();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 18:
                 value = getHardwareVersion();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 19:
                 value = getSoftwareVersion();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (String) value);
             case 20:
                 value = getBatteryStatus();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (int) value);
             case 21:
                 value = getMemoryTotal();
-                printReadLog(server, getModel().id, getId(), resourceId, value);
+                printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
                 return ReadResponse.success(resourceId, (long) value);
             default:
                 return super.read(server, resourceId);
@@ -285,11 +288,6 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
         }, 500);
     }
 
-    private void printReadLog(LwM2mServer server, int modelId, int instanceId, int resourceId, Object value) {
-        if (!server.isSystem()) {
-        org.thingsboard.lwm2m.demo.client.util.Utils.printReadLog(getModel().name, modelId, instanceId, resourceId, value);
-        }
-    }
     @Override
     public void destroy() {
         timer.cancel();

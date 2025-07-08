@@ -14,26 +14,27 @@ java -jar thingsboard-lwm2m-demo-client.jar [options]
 
 ## General Options
 
-| Option                                     | Description                                                                                                                                                                                                                                                                           |
-|:-------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                             |
-| `-v`, `-vv`, `-vvv`, `-vvvv`               | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                            |
-| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                            |
-| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                    |
-| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default:`-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                    |
-| `-l, --lifetime`                           | Registration lifetime in seconds (default:`-l 300` in sec).                                                                                                                                                                                                                           |
-| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                         |
-| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                            |
-| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. See [Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                       |
-| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software. See [Using OTA from a Custom Folder](#using-ota-from-a-custom-folder)                                                                                                                                         |
-| `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA).Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                     |
-| `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files. Test mode supports Object IDs 5 and 9, utilizing Object 19. Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`. |
-| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example:`-aa attr1=value1,attr2=value2`.                                                                                                                                                                                       |
-| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example:`-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                |
-| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example:`-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                     |
-| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example:`-jc`.                                                                                                                                                                                                                           |
-| `-cli, --command-line-interactive`         | Enables interactive command-line mode for executing dynamic commands. Syntax example:`-cli`.                                                                                                                                                                                          |
-| `-tcli, --time-out-cli`                    | Timeout interval (in seconds) for flushing logs if no user input is received in CLI mode. Syntax example:`-tcli 10`.                                                                                                                                                                  |
+| Option                                     | Description                                                                                                                                                                                                                                                                               |
+|:-------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-h, --help`                               | Display help information.                                                                                                                                                                                                                                                                 |
+| `-v`, `-vv`, `-vvv`, `-vvvv`               | Specify multiple `-v` options to increase verbosity. For example: `-v -v -v` or `-vvv`. More precise logging can be configured using a logback configuration file. See [How to activate more log?](#how-to-activate-more-log) for details.                                                |
+| `-u, --server-url`                         | Set the server URL. Defaults to `-u coap://localhost:5685` or `-u coaps://localhost:5686`.                                                                                                                                                                                                |
+| `-b, --bootstrap`                          | Use bootstrap mode instead of direct registration.                                                                                                                                                                                                                                        |
+| `-n, --endpoint-name`                      | Set the endpoint name for the client. Default:`-n ${hostname}` or `-n ThingsboardLwm2mClientDemo`.                                                                                                                                                                                        |
+| `-l, --lifetime`                           | Registration lifetime in seconds (default:`-l 300` in sec).                                                                                                                                                                                                                               |
+| `-cp, --communication-period`              | Period for client-server communication (should be smaller than lifetime). It will be used even if -b is used.                                                                                                                                                                             |
+| `-q, --queue-mode`                         | Enable queue mode (not fully implemented).                                                                                                                                                                                                                                                |
+| `-m, --models-folder`                      | Path to a folder containing OMA DDF (XML) object models. See [Use object models from a custom folder:](#use-object-models-from-a-custom-folder)                                                                                                                                           |
+| `-o, --ota-folder`                         | Path to the folder containing OTA information for firmware or software. See [Using OTA from a Custom Folder](#using-ota-from-a-custom-folder)                                                                                                                                             |
+| `-tobj, --test-objects`                    | Enables testing of custom-programmed algorithms (e.g., OTA).Test mode is available for Object IDs 5, 9.  Syntax example: `-tobj`.                                                                                                                                                         |
+| `-tota, --test-ota`                        | Allows testing of firmware and software updates using real OTA files. Test mode supports Object IDs 5 and 9, utilizing Object 19. Using Object 19 (instance 65456 for firmware, 65457 for software) to pass additional OTA file information in JSON format.  Syntax example: `-tota`.     |
+| `-tFreq, --timeDataFrequency`              | This option specifies the reporting interval (in seconds) for the Observe resource functionality on the object when invoking the fireResourceChange method. Default value: 5 seconds.  Syntax example: `-tFrec 60`.                                                                       |
+| `-aa, --additional-attributes`             | Additional attributes to send during registration. For example:`-aa attr1=value1,attr2=value2`.                                                                                                                                                                                           |
+| `-bsaa, --bootstrap-additional-attributes` | Additional attributes for bootstrap. Syntax example:`-bsaa attr1=value1,attr2=value2`.                                                                                                                                                                                                    |
+| `-ocf, --support-old-format`               | Enable support for old/unofficial content formats. Syntax example:`-ocf`. See [Leshan support old TLV and JSON code](https://github.com/eclipse/leshan/pull/720).                                                                                                                         |
+| `-jc, --use-java-coap`                     | Use Java-CoAP instead of Californium. Syntax example:`-jc`.                                                                                                                                                                                                                               |
+| `-cli, --command-line-interactive`         | Enables interactive command-line mode for executing dynamic commands. Syntax example:`-cli`.                                                                                                                                                                                              |
+| `-tcli, --time-out-cli`                    | Timeout interval (in seconds) for flushing logs if no user input is received in CLI mode. Default value is 5 sec. Syntax example:`-tcli 10`.                                                                                                                                              |
 
 **Note:** Only one of these parameters (`-tobj` or `-tota`) can be used at a time.
 
@@ -597,7 +598,7 @@ mvn clean package -DskipTests
 The built JAR is located at:
 
 ```
-target/thingsboard-lwm2m-demo-client-4.1.2.jar
+target/thingsboard-lwm2m-demo-client-4.1.3.jar
 ```
 
 or 
@@ -609,7 +610,7 @@ target/thingsboard-lwm2m-demo-client-{version}.jar
 #### 🔹 Default run
 
 ```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.2.jar
+java -jar thingsboard-lwm2m-demo-client-4.1.3.jar
 ```
 
 or
@@ -621,25 +622,25 @@ java -jar thingsboard-lwm2m-demo-client-{version}.jar
 #### 🔹 Run in NoSec mode (URL = local server: localhost; port = 5685)
 
 ```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.2.jar -u coap://localhost:5685 -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-4.1.3.jar -u coap://localhost:5685 -n MyClientNoSec
 ```
 
 #### 🔹 Run in DTLS (PSK) mode (URL = local server: localhost; port = 5686)
 
 ```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.2.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lwm2m-demo-client-4.1.3.jar -u coaps://localhost:5686 -n MyClientPsk -i myIdentity -p 01020304050607080A0B0C0D0F010203
 ```
 
 #### 🔹 Run in NoSec mode (URL = demo.thingsboard.io)
 
 ```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.2.jar -u coap://demo.thingsboard.io -n MyClientNoSec
+java -jar thingsboard-lwm2m-demo-client-4.1.3.jar -u coap://demo.thingsboard.io -n MyClientNoSec
 ```
 
 #### 🔹 Run in DTLS (PSK) mode (URL = demo.thingsboard.io)
 
 ```bash
-java -jar thingsboard-lwm2m-demo-client-4.1.2.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
+java -jar thingsboard-lwm2m-demo-client-4.1.3.jar -u coaps://demo.thingsboard.io -n MyClientPsk --psk-identity myIdentity --psk-key 01020304050607080A0B0C0D0F010203
 ```
 
 ---

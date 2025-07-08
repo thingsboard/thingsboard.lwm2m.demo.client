@@ -81,49 +81,65 @@ public class LwM2mBinaryAppDataContainer extends BaseInstanceEnabler implements 
 
     public LwM2mBinaryAppDataContainer() {
         // notify new date each 5 second
-        this.timer = new Timer("19 - Device-Current Time");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                fireResourceChange(0);
-                fireResourceChange(2);
-            }
-        }, 5000, 5000);
+        this(5);
     }
 
-    public LwM2mBinaryAppDataContainer(Integer id) {
-        if (id != null) this.setId(id);
+    public LwM2mBinaryAppDataContainer(Integer timeDataFrequency) {
         // notify new date each 5 second
-        this.timer = new Timer("19 - Device-Current Time");
+        this.timer = new Timer("Id = [19] BinaryAppDataContainer -> schedule Time period = [" + timeDataFrequency + "] sec");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 fireResourceChange(0);
                 fireResourceChange(2);
             }
-        }, 5000, 5000);
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
+    }
 
+    public LwM2mBinaryAppDataContainer(Integer timeDataFrequency, Integer id) {
+        if (id != null) this.setId(id);
+        // notify new date each 5 second
+        this.timer = new Timer("Id = [19] BinaryAppDataContainer -> schedule Time period = [" + timeDataFrequency + "] sec");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(0);
+                fireResourceChange(2);
+            }
+        }, timeDataFrequency*1000, timeDataFrequency*1000);
     }
 
     @Override
-    public ReadResponse read(LwM2mServer identity, int resourceId) {
+    public ReadResponse read(LwM2mServer server, int resourceId) {
         try {
+            Object value;
             switch (resourceId) {
                 case 0:
-                    ReadResponse response = ReadResponse.success(resourceId, getData(), ResourceModel.Type.OPAQUE);
-                    return response;
+                    value = getData();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, printMap ((Map<Integer, ?>) value) );
+                    return  ReadResponse.success(resourceId, (Map<Integer, ?>) value, ResourceModel.Type.OPAQUE);
                 case 1:
-                    return ReadResponse.success(resourceId, getPriority());
+                    value = getPriority();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                    return ReadResponse.success(resourceId, (int) value);
                 case 2:
-                    return ReadResponse.success(resourceId, getTimestamp());
+                    value = getTimestamp();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                    return ReadResponse.success(resourceId, (Time) value);
                 case 3:
-                    return ReadResponse.success(resourceId, getDescription());
+                    value = getDescription();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                    return ReadResponse.success(resourceId, (String) value);
                 case 4:
-                    return ReadResponse.success(resourceId, getDataFormat());
+                    value = getDataFormat();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                    return ReadResponse.success(resourceId, (String) value);
                 case 5:
-                    return ReadResponse.success(resourceId, getAppID());
+                    value = getAppID();
+                    printReadLog(server, getModel().name, getModel().id, getId(), resourceId, value);
+                    return ReadResponse.success(resourceId, (Integer) value);
                 default:
-                    return super.read(identity, resourceId);
+                    return super.read(server, resourceId);
             }
         } catch (Exception e) {
             return ReadResponse.badRequest(e.getMessage());
