@@ -2,7 +2,9 @@
 
 ## Overview
 
-The **ThingsBoard LwM2M Demo Client** is a command-line tool for simulating an LwM2M client and connecting it to a ThingsBoard server. It supports various configuration options, including server connection settings, security options (DTLS), and object model customization.
+The **ThingsBoard LwM2M Demo Client** is a command-line tool for simulating an LwM2M client and connecting it to a ThingsBoard server. 
+
+It supports various configuration options, including server connection settings, security options (DTLS), and object model customization.
 
 ## Usage
 
@@ -11,6 +13,137 @@ To run the client, use the following command:
 ```sh
 java -jar thingsboard-lwm2m-demo-client.jar [options]
 ```
+
+## Default Configuration
+
+By default, the ThingsBoard LwM2M Demo Client starts with the following object and resource configuration:
+
+### The system`s  objects (not change and send command)
+```psql
+/0/0 :  LWM2M Security [Object v1.2]  
+  /0 : LWM2M  Server URI  
+  /1 : Bootstrap-Server  
+  /2 : Security Mode  
+  /3 : Public Key or Identity  
+  /4 : Server Public Key  
+  /5 : Secret Key  
+  /10 : Short Server ID  
+  /15 : Certificate Usage  
+  /17 : OSCORE Security Mode  
+/1/0 :  LwM2M Server [Object v1.1]  
+  /0 : Short Server ID  
+  /1 : Lifetime  
+  /2 : Default Minimum Period  
+  /3 : Default Maximum Period  
+  /6 : Notification Storing When Disabled or Offline  
+  /7 : Binding  
+  /8 : Registration Update Trigger  
+  /22 : Preferred Transport 
+```
+
+### The objects for DEBUG
+```psql   
+
+/3442/0  : LwM2M v1.1 Test Object [Object v1.0]  
+  /0     : Reset values  
+  /1     : Randomize values  
+  /2     : Clear values  
+  /3     : Exec With Arguments  
+  /4     : Arguments List  
+  /5     : Send Data  
+  /6     : Resources to Send  
+  /110   : String Value  
+  /120   : Integer Value  
+  /125   : Unsigned Integer Value  
+  /130   : Float Value  
+  /140   : Boolean Value  
+  /150   : Opaque Value  
+  /160   : Time Value  
+  /170   : ObjLink Value  
+  /180   : CoreLnk Value  
+  /1110  : Multiple String Value  
+  /1120  : Multiple Integer Value  
+  /1125  : Multiple Unsigned Integer Value  
+  /1130  : Multiple Float Value  
+  /1140  : Multiple Boolean Value  
+  /1150  : Multiple Opaque Value  
+  /1160  : Multiple Time Value  
+  /1170  : Multiple ObjLink Value  
+  /1180  : Multiple CoreLnk Value  
+
+/3/0     : Device [Object v1.2]  
+  /0     : Manufacturer  
+  /1     : Model Number  
+  /2     : Serial Number  
+  /3     : Firmware Version  
+  /9     : Battery Level  
+  /10    : Memory Free  
+  /11    : Error Code  
+  /13    : Current Time  
+  /14    : UTC Offset  
+  /15    : Timezone  
+  /16    : Supported Binding and Modes  
+  /17    : Device Type  
+  /18    : Hardware Version  
+  /19    : Software Version  
+  /20    : Battery Status  
+  /21    : Memory Total  
+
+/19/0    : BinaryAppDataContainer [Object v1.0]  
+/19/1    : BinaryAppDataContainer [Object v1.0]  
+  /0     : Data  
+  /1     : Data Priority  
+  /2     : Data Creation Time  
+  /3     : Data Description  
+  /4     : Data Format  
+  /5     : App ID  
+
+/5/0     : Firmware Update [Object v1.1]  
+  /0     : Package  
+  /1     : Package URI  
+  /2     : Update  
+  /3     : State  
+  /5     : Update Result  
+  /6     : PkgName  
+  /7     : PkgVersion  
+  /9     : Firmware Update Delivery Method  
+
+/6/0     : Location [Object v1.0]  
+  /0     : Latitude  
+  /1     : Longitude  
+  /5     : Timestamp  
+
+/3303/0  : Temperature [Object v1.1]  
+  /5700  : Sensor Value  
+  /5701  : Sensor Units  
+  /5602  : Max Measured Value  
+  /5601  : Min Measured Value  
+  /5605  : Reset Min and Max Measured Values  
+
+/9/0     : LWM2M Software Management [Object v1.0]  
+  /0     : PkgName  
+  /1     : PkgVersion  
+  /2     : Package  
+  /3     : Package URI  
+  /4     : Install  
+  /6     : Uninstall  
+  /7     : Update State  
+  /9     : Update Result  
+```
+## Discovering Available Objects and Versions
+
+To find out which LwM2M objects are registered and which versions are used, you can launch the demo client in CLI mode and use the list command:
+
+```sh
+docker run --rm -it thingsboard/tb-lwm2m-demo-client:latest -u coap://demo.thingsboard.io -n MyClientNoSec -cli
+```
+Inside the interactive CLI, type:
+
+```sh
+list
+```
+
+This command will display all available LwM2M objects, instances, resources, and their versions.
 
 ## General Options
 
