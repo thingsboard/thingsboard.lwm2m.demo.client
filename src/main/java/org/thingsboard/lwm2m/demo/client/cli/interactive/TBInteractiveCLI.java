@@ -91,9 +91,9 @@ public class TBInteractiveCLI {
         pw.flush();
         String helpGreenText = "\u001B[34m" + sw + "\u001B[0m";
         if (this.reader != null) {
-            this.reader.printAbove(helpGreenText); // якщо інтерактивний режим
+            this.reader.printAbove(helpGreenText); // if interactive
         } else {
-            System.out.println(helpGreenText); // звичайний консольний вивід
+            System.out.println(helpGreenText); // to console
         }
 
     }

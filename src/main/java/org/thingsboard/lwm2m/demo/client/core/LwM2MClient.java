@@ -33,6 +33,7 @@ import org.eclipse.leshan.client.endpoint.LwM2mClientEndpointsProvider;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.LwM2mTestObject;
 import org.eclipse.leshan.client.object.Oscore;
+import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
@@ -111,81 +112,53 @@ import static org.thingsboard.lwm2m.demo.client.util.Utils.fromLength;
 public class LwM2MClient {
 
     public LeshanClient create(TBSectionsCliMain cli, LwM2mModelRepository repository) throws Exception {
-                // create Thingsboard Lwm2m Demo Client from command line option
+        // create Thingsboard Lwm2m Demo Client from command line option
         // Initialize object list
         final ObjectsInitializer initializer = new ObjectsInitializer(repository.getLwM2mModel());
         // handle OSCORE
         Integer oscoreObjectInstanceId;
         if (cli.oscore != null) {
-            oscoreObjectInstanceId = 12345;
+            oscoreObjectInstanceId = 65535;
             Oscore oscoreObject = new Oscore(oscoreObjectInstanceId, cli.oscore.getOscoreSetting());
             initializer.setInstancesForObject(OSCORE, oscoreObject);
         } else {
             oscoreObjectInstanceId = null;
             initializer.setClassForObject(OSCORE, Oscore.class);
         }
-        if (cli.main.bootstrap) {
-            if (cli.identity.isPSK()) {
-                // TODO OSCORE support OSCORE with DTLS/PSK
-                initializer.setInstancesForObject(SECURITY, pskBootstrap(cli.main.url,
-                        cli.identity.getPsk().identity.getBytes(), cli.identity.getPsk().sharekey.getBytes()));
-                initializer.setClassForObject(SERVER, Server.class);
-            } else if (cli.identity.isRPK()) {
-                // TODO OSCORE support OSCORE with DTLS/RPK
-                initializer.setInstancesForObject(SECURITY,
-                        rpkBootstrap(cli.main.url, cli.identity.getRPK().cpubk.getEncoded(),
-                                cli.identity.getRPK().cprik.getEncoded(), cli.identity.getRPK().spubk.getEncoded()));
-                initializer.setClassForObject(SERVER, Server.class);
-            } else if (cli.identity.isx509()) {
-                // TODO OSCORE support OSCORE with DTLS/X509
-                initializer.setInstancesForObject(SECURITY,
-                        x509Bootstrap(cli.main.url, cli.identity.getX509().ccert.getEncoded(),
-                                cli.identity.getX509().cprik.getEncoded(), cli.identity.getX509().scert.getEncoded(),
-                                cli.identity.getX509().certUsage.code));
-                initializer.setClassForObject(SERVER, Server.class);
-            } else {
-                if (oscoreObjectInstanceId != null) {
-                    initializer.setInstancesForObject(SECURITY,
-                            oscoreOnlyBootstrap(cli.main.url, oscoreObjectInstanceId));
-                } else {
-                    initializer.setInstancesForObject(SECURITY, noSecBootstrap(cli.main.url));
-                }
-                initializer.setClassForObject(SERVER, Server.class);
-            }
-        } else {
-            BindingMode serverBindingMode = BindingMode.fromProtocol(Protocol.fromUri(cli.main.url));
 
-            if (cli.identity.isPSK()) {
-                // TODO OSCORE support OSCORE with DTLS/PSK
-                initializer.setInstancesForObject(SECURITY, psk(cli.main.url, 123,
-                        cli.identity.getPsk().identity.getBytes(), cli.identity.getPsk().sharekey.getBytes()));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec,
-                        EnumSet.of(serverBindingMode), false, serverBindingMode));
-            } else if (cli.identity.isRPK()) {
-                // TODO OSCORE support OSCORE with DTLS/RPK
-                initializer.setInstancesForObject(SECURITY,
-                        rpk(cli.main.url, 123, cli.identity.getRPK().cpubk.getEncoded(),
-                                cli.identity.getRPK().cprik.getEncoded(), cli.identity.getRPK().spubk.getEncoded()));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec,
-                        EnumSet.of(serverBindingMode), false, serverBindingMode));
-            } else if (cli.identity.isx509()) {
-                // TODO OSCORE support OSCORE with DTLS/X509
-                initializer.setInstancesForObject(SECURITY,
-                        x509(cli.main.url, 123, cli.identity.getX509().ccert.getEncoded(),
-                                cli.identity.getX509().cprik.getEncoded(), cli.identity.getX509().scert.getEncoded(),
-                                cli.identity.getX509().certUsage.code));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec,
-                        EnumSet.of(serverBindingMode), false, serverBindingMode));
-            } else {
-                if (oscoreObjectInstanceId != null) {
-                    initializer.setInstancesForObject(SECURITY, oscoreOnly(cli.main.url, 123, oscoreObjectInstanceId));
-                } else {
-                    initializer.setInstancesForObject(SECURITY, noSec(cli.main.url, 123));
-                }
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec,
-                        EnumSet.of(serverBindingMode), false, serverBindingMode));
-            }
+        /**
+         * 1) lwm2mBootstrap
+         * SECURITY: InstanceId = 0  Short Server ID == null (BS)
+         * SECURITY: InstanceId = 1  Short Server ID == 1-65534 (Lwm2m)
+         * SERVER:  InstanceId = 0 Short Server ID == 1-65534  (Lwm2m)
+         * 2) Only BS Server
+         * SECURITY: InstanceId = 0  Short Server ID == null bs
+         * SERVER:  InstanceId = 0 Short Server ID == (1-65534)
+         * 3) Only Lwm2m Server
+         * SECURITY: InstanceId = 0  Short Server ID == (1-65534)
+         * SERVER:  InstanceId = 0 Short Server ID == (1-65534)
+         * */
+
+        int shortServerId = 123;
+        // Security
+        if (cli.main.lwm2mBootstrap) {
+            Security securityBs = setSecurityBootstrap(cli, oscoreObjectInstanceId, cli.main.urlBs);
+            Security securityLwm2m = setSecurityLwm2m(cli, oscoreObjectInstanceId, shortServerId);
+            initializer.setInstancesForObject(SECURITY, securityBs, securityLwm2m);
+        } else if (cli.main.bootstrap) {
+            Security securityBs = setSecurityBootstrap(cli, oscoreObjectInstanceId, cli.main.url);
+            initializer.setInstancesForObject(SECURITY, securityBs);
+        } else {
+            Security securityLwm2m = setSecurityLwm2m(cli, oscoreObjectInstanceId, shortServerId);
+            initializer.setInstancesForObject(SECURITY, securityLwm2m);
         }
+
+        // Server
+        BindingMode serverBindingMode = BindingMode.fromProtocol(Protocol.fromUri(cli.main.url));
+        Server serverLwm2m = new Server(shortServerId, cli.main.lifetimeInSec,
+                EnumSet.of(serverBindingMode), false, serverBindingMode);
+        initializer.setInstancesForObject(SERVER, serverLwm2m);
+
         if (cli.main.testObject && cli.main.testOta){
             throw new IllegalStateException("Only one of these parameters (`-tobj` or `-tota`) can be used at a time.");
         }
@@ -356,5 +329,49 @@ public class LwM2MClient {
         });
 
         return client;
+    }
+
+    private Security setSecurityBootstrap(TBSectionsCliMain cli, Integer oscoreObjectInstanceId, String url)  throws Exception {
+        Security securityBs;
+        if (cli.identity.isPSK()) {
+            securityBs = pskBootstrap(url,
+                    cli.identity.getPsk().identity.getBytes(), cli.identity.getPsk().sharekey.getBytes());
+        } else if (cli.identity.isRPK()) {
+            securityBs = rpkBootstrap(url, cli.identity.getRPK().cpubk.getEncoded(),
+                    cli.identity.getRPK().cprik.getEncoded(), cli.identity.getRPK().spubk.getEncoded());
+        } else if (cli.identity.isx509()) {
+            securityBs = x509Bootstrap(url, cli.identity.getX509().ccert.getEncoded(),
+                    cli.identity.getX509().cprik.getEncoded(), cli.identity.getX509().scert.getEncoded(),
+                    cli.identity.getX509().certUsage.code);
+        } else {
+            if (oscoreObjectInstanceId != null) {
+                securityBs = oscoreOnlyBootstrap(url, oscoreObjectInstanceId);
+            } else {
+                securityBs = noSecBootstrap(url);
+            }
+        }
+        return securityBs;
+    }
+
+    private Security setSecurityLwm2m(TBSectionsCliMain cli, Integer oscoreObjectInstanceId, int shortServerId)  throws Exception {
+        Security securityLwm2m;
+        if (cli.identity.isPSK()) {
+            securityLwm2m = psk(cli.main.url, shortServerId,
+                    cli.identity.getPsk().identity.getBytes(), cli.identity.getPsk().sharekey.getBytes());
+        } else if (cli.identity.isRPK()) {
+            securityLwm2m = rpk(cli.main.url, shortServerId, cli.identity.getRPK().cpubk.getEncoded(),
+                    cli.identity.getRPK().cprik.getEncoded(), cli.identity.getRPK().spubk.getEncoded());
+        } else if (cli.identity.isx509()) {
+            securityLwm2m = x509(cli.main.url, shortServerId, cli.identity.getX509().ccert.getEncoded(),
+                    cli.identity.getX509().cprik.getEncoded(), cli.identity.getX509().scert.getEncoded(),
+                    cli.identity.getX509().certUsage.code);
+        } else {
+            if (oscoreObjectInstanceId != null) {
+                securityLwm2m = oscoreOnly(cli.main.url, shortServerId, oscoreObjectInstanceId);
+            } else {
+                securityLwm2m = noSec(cli.main.url, shortServerId);
+            }
+        }
+        return securityLwm2m;
     }
 }

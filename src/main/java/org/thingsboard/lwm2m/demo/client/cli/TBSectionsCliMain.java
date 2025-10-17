@@ -85,16 +85,29 @@ public class TBSectionsCliMain implements Runnable {
 
         @Option(names = { "-u", "--server-url" },
                 description = { //
-                        "Set the server URL. If port is missing it will be added automatically with default value.", //
+                        "Set if only one the server URL. If port is missing it will be added automatically with default value.", //
                         "Default: ", //
                         "  - " + DEFAULT_COAP_URL + " for coap", //
                         "  - " + DEFAULT_COAPS_URL + " for coaps" })
         public String url;
 
+        @Option(names = { "-u_b", "--server-url-bs" },
+                description = { //
+                        "Additional URL for Bootstrap section. Set if only one the server URL, if you are configuring two servers at the same time (Bootstrap section only). If the port is missing, it will be added automatically with a default value for bootstrap (5687 or 5688).", //
+                        "Default: ", //
+                        "  - " + DEFAULT_COAP_URL + " for coap", //
+                        "  - " + DEFAULT_COAPS_URL + " for coaps" })
+        public String urlBs;
+
         @Option(names = { "-b", "--bootstrap" },
                 description = { "Do bootstrap instead of registration.",
                         "In this case your server-url should target a LWM2M bootstrap server instead of a LWM2M server." })
         public boolean bootstrap;
+
+        @Option(names = { "-lw_b", "--lwm2m_bootstrap" },
+                description = { "Run lwm2m server registration with bootstrap partition",
+                        "In this case, your server URL should point to the LWM2M server. Using the Bootstrap-Request Trigger, you have the ability to connect to the LWM2M bootstrap server." })
+        public boolean lwm2mBootstrap;
 
         @Option(names = { "-n", "--endpoint-name" },
                 description = { //
