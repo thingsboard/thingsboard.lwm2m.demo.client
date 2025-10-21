@@ -120,9 +120,9 @@ public class TBSectionCliInteractiveCommands extends TBJLineInteractiveCommands 
     }
 
     /**
-     * A command to list objects.
+     * A command to discover objects.
      */
-    @Command(name = "list",
+    @Command(name = "discover",
              description = "List available Objects, Instances and Resources",
              headerHeading = "%n",
              footer = "")

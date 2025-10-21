@@ -28,7 +28,7 @@
 
     <groupId>org.thingsboard.lwm2m.demo.client</groupId>
     <artifactId>thingsboard-lwm2m-demo-client</artifactId>
-    <version>4.1.4</version>
+    <version>4.2.1</version>
     <packaging>jar</packaging>
 
     <name>thingsboard-demo-client</name>
